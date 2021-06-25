@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Feb 19 14:37:57 2021
+Created on Fri Jun 25 11:18:47 2021
 
-@author: Shay Kreymer
+@author: kreym
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy
