@@ -151,6 +151,22 @@ def rot_img_freqT(theta, c, kvals, Bk, L, T):
     """
     return np.real(np.fft.ifft2((Bk*np.exp(1j*kvals*theta)@(T.H@c))))[L//2:-(L//2), L//2:-(L//2)]
 
+def rot_img_freq(theta, z, kvals, Bk, L):
+    """ Rotate image by angle theta (in radians)
+    Args:
+        theta: angle of rotation (in radians)
+        c: real representation of the expansion coefficients of the target image
+        kvals: vector of frequencies
+        Bk: matrix that maps from the expansion coefficients to the approximated image, in the freuency domain
+        L: diameter of the target image
+        T: matrix that maps from the real representation to the complex representation of the expansion coefficients
+        
+    Returns:
+        original image rotated by angle theta
+    """
+    return np.real(np.fft.ifft2((Bk*np.exp(1j*kvals*theta)@(z))))[L//2:-(L//2), L//2:-(L//2)]
+
+
 def min_err_coeffs(z, z_est, kvals):
     """ Calculate estimation error for vector of coefficients, while taking the in-plane rotation symmetry into account
     Args:
