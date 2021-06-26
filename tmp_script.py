@@ -25,7 +25,7 @@ W = 2*L - 1 # L for arbitrary spacing distribution, 2*L-1 for well-separated
 K = 4 # discretization of rotations
 
 gamma = 0.04
-N = 400
+N = 5000
 N = (N // L) * L
 ne = 45
 B, z, roots, kvals, nu = expand_fb(F, ne)
@@ -50,3 +50,25 @@ Mss = [item for sublist in Mss for item in sublist]
 Ms = np.zeros((L, L, Nd))
 for idx, Mm in enumerate(Mss):
     Ms[ :, :, idx] = Mm
+    
+Mss_clean = [np.array_split(Mm, np.sqrt(Nd), axis=1) for Mm in np.array_split(M_clean, np.sqrt(Nd), axis=0)]
+Mss_clean = [item for sublist in Mss_clean for item in sublist]
+Ms_clean = np.zeros((L, L, Nd))
+for idx, Mm in enumerate(Mss_clean):
+    Ms_clean[ :, :, idx] = Mm
+    
+M_empty = np.sum(Ms_clean, axis=(0,1))
+beta = np.sum(M_empty == 0) / Nd
+    
+F_init = np.random.rand(L, L)
+F_init = F_init / np.linalg.norm(F_init)
+_, z_init, _, _, _ = expand_fb(F_init, ne)
+
+rho_init = np.zeros((2*L, 2*L))
+for i in range(2*L):
+    for j in range(2*L):
+        rho_init[i, j] = (1 - beta) / (2*L - 1)**2
+        if i == L or j == L:
+            rho_init[i, j] = beta / (4*L - 1)
+            
+z, rho = EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2)
