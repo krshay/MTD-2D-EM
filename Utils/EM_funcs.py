@@ -37,15 +37,15 @@ def EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2):
 def z_step(z_k, pl_phi_k, Ms, B, L, K, Nd, nu, roots, kvals, PsiPsi_vals):
     Phi = calc_Phi(K)
     Ls = calc_shifts(L)
-    nume = np.zeros((nu, ), dtype=np.complex_)
-    deno = np.zeros((nu, nu), dtype=np.complex_)
+    y = np.zeros((nu, ), dtype=np.complex_)
+    A = np.zeros((nu, nu), dtype=np.complex_)
     for (iPhi, phi) in enumerate(Phi):
         print(iPhi)
         for l in Ls:
-            nume += np.diag(np.exp(-1j * kvals * phi)) @ (pl_phi_k[iPhi, l[0], l[1], :] @ \
+            y += np.diag(np.exp(-1j * kvals * phi)) @ (pl_phi_k[iPhi, l[0], l[1], :] @ \
                 np.sum(np.repeat(Ms[:, :, :, np.newaxis], nu, axis=3) * np.repeat(CTZB(B, l, L)[ :, :, np.newaxis, :], np.shape(Ms)[2], axis=(2)), axis=(0, 1)))
-            deno += np.diag(np.exp(-1j * kvals * phi)) * np.sum(pl_phi_k[iPhi, l[0], l[1], :]) * PsiPsi_vals[l[0], l[0], :, :]
-    return np.linalg.inv(deno) @ nume
+            A += np.diag(np.exp(-1j * kvals * phi)) @ (np.sum(pl_phi_k[iPhi, l[0], l[1], :]) * PsiPsi_vals[l[0], l[0], :, :])
+    return np.linalg.inv(A) @ y
 
 def rho_step(rho_k, pl_phi_k, Nd):
     return np.sum(pl_phi_k, axis=(0, 3)) / Nd
@@ -53,7 +53,9 @@ def rho_step(rho_k, pl_phi_k, Nd):
 def pMm_l_phi_z(Ms, l, phi, z, kvals, Bk, L, sigma2, Nd):
     F_phi = rot_img_freq(phi, z, kvals, Bk, L)
     CTZF_phi = CTZ(F_phi, l, L)
-    return np.exp(- np.sum((Ms - np.expand_dims(CTZF_phi, 2)) ** 2, axis=(0, 1)) / (2 * sigma2))
+    S = np.sum((Ms - np.expand_dims(CTZF_phi, 2)) ** 2, axis=(0, 1)) / (2 * sigma2)
+    S = S - np.max(S)
+    return np.exp(- S)
 
 def CTZ(F, l, L):
     TZF = np.zeros((2*L, 2*L), dtype=np.complex_)

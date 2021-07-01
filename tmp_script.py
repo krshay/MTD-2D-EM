@@ -25,7 +25,7 @@ W = 2*L - 1 # L for arbitrary spacing distribution, 2*L-1 for well-separated
 K = 10 # discretization of rotations
 
 gamma = 0.04
-N = 20000
+N = 1000
 N = (N // L) * L
 ne = 50
 B, z, roots, kvals, nu = expand_fb(F, ne)
