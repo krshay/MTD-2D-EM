@@ -41,7 +41,9 @@ for i in range(nu):
 M_clean, s, locs = generate_clean_micrograph_2d_rots_discrete(c, kvals, Bk, W, L, N, gamma*(N/L)**2, T, K, seed=100)
 
 gamma = s[0]*(L/N)**2
-sigma2 = 10
+
+sigma2 = 1
+
 M = M_clean + rng.normal(loc=0, scale=np.sqrt(sigma2), size=np.shape(M_clean))
 
 Nd = int((N / L) ** 2)
