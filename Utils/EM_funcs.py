@@ -54,7 +54,6 @@ def pMm_l_phi_z(Ms, l, phi, z, kvals, Bk, L, sigma2, Nd):
     F_phi = rot_img_freq(phi, z, kvals, Bk, L)
     CTZF_phi = CTZ(F_phi, l, L)
     S = np.sum((Ms - np.expand_dims(CTZF_phi, 2)) ** 2, axis=(0, 1)) / (2 * sigma2)
-    S = S - np.max(S)
     return np.exp(- S)
 
 def CTZ(F, l, L):
