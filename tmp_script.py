@@ -42,7 +42,7 @@ M_clean, s, locs = generate_clean_micrograph_2d_rots_discrete(c, kvals, Bk, W, L
 
 gamma = s[0]*(L/N)**2
 
-sigma2 = 0.01
+sigma2 = 10
 
 M = M_clean + rng.normal(loc=0, scale=np.sqrt(sigma2), size=np.shape(M_clean))
 
@@ -73,6 +73,5 @@ for i in range(2*L):
         if i == L or j == L:
             rho_init[i, j] = beta / (4*L - 1)
 
-######### NOTICE z and SHOULD BE z_init
-z, rho = EM(Ms, z, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2)
+z, rho = EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2)
 
