@@ -85,7 +85,7 @@ def generate_clean_micrograph_2d_rots_discrete(c, kvals, Bk, W, L, N, m, T, K, s
     if seed != None:
         np.random.seed(seed)
     m = round(m)
-    possible_thetas = np.linspace(0, 360, K, endpoint=False)
+    possible_thetas = np.linspace(0, 2 * np.pi, K, endpoint=False)
     rng = default_rng()
     thetas = possible_thetas[rng.integers(low=0, high=K, size=(m, ))]
 

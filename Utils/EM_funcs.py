@@ -20,14 +20,14 @@ def EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2):
     PsiPsi_vals = PsiPsi(B, L, nu)
     for _ in range(5):
         for (iPhi, phi) in enumerate(Phi):
-            print(iPhi)
             for l in Ls:
                 pM_k[iPhi, l[0], l[1], :] = np.real(pMm_l_phi_z(Ms, l, phi, z_k, kvals, Bk, L, sigma2, Nd))
-        # pM_k = pM_k / np.sum(pM_k, axis=(0, 1, 2))
-        pl_phi_k = pM_k * np.expand_dims(np.moveaxis(np.expand_dims(rho_k, 2),  [0,1,2], [1,2,0]), 3)
-        pl_phi_k = pl_phi_k / np.sum(pl_phi_k, axis=(0, 1, 2))
+        pM_k = pM_k / np.sum(pM_k, axis=(0, 1, 2))
+        likelihood_func_l_phi = pM_k * np.expand_dims(np.moveaxis(np.expand_dims(rho_k, 2),  [0,1,2], [1,2,0]), 3)
+        pl_phi_k = likelihood_func_l_phi / np.sum(likelihood_func_l_phi, axis=(0, 1, 2))
         # pl_phi_k[np.isnan(pl_phi_k)] = 0 ## CHECK!!!
-        
+        log_likelihood = np.sum(np.log10(np.sum(likelihood_func_l_phi, axis=(0, 1, 2))))
+        print(f'log-likelihood = {log_likelihood}')
         rho_updated = rho_step(rho_k, pl_phi_k, Nd)
         z_updated = z_step(z_k, pl_phi_k, Ms, B, L, K, Nd, nu, roots, kvals, PsiPsi_vals)
         z_k = z_updated
@@ -40,7 +40,6 @@ def z_step(z_k, pl_phi_k, Ms, B, L, K, Nd, nu, roots, kvals, PsiPsi_vals):
     y = np.zeros((nu, ), dtype=np.complex_)
     A = np.zeros((nu, nu), dtype=np.complex_)
     for (iPhi, phi) in enumerate(Phi):
-        print(iPhi)
         for l in Ls:
             y += np.diag(np.exp(-1j * kvals * phi)) @ (pl_phi_k[iPhi, l[0], l[1], :] @ \
                 np.sum(np.repeat(Ms[:, :, :, np.newaxis], nu, axis=3) * np.repeat(CTZB(B, l, L)[ :, :, np.newaxis, :], np.shape(Ms)[2], axis=(2)), axis=(0, 1)))
@@ -57,14 +56,16 @@ def pMm_l_phi_z(Ms, l, phi, z, kvals, Bk, L, sigma2, Nd):
     return np.exp(- S)
 
 def CTZ(F, l, L):
-    TZF = np.zeros((2*L, 2*L), dtype=np.complex_)
-    TZF[tuple(np.meshgrid(np.arange(l[0], l[0] + L) % (2*L), np.arange(l[1], l[1] + L) % (2*L)))] = F
+    ZF = np.zeros((2*L, 2*L), dtype=np.complex_)
+    ZF[ :L, :L] = F
+    TZF = np.roll(ZF, l, axis=(0, 1))
     CTZF = TZF[ :L, :L]
     return CTZF
 
 def CTZB(B, l, L):
-    TZB = np.zeros((2*L, 2*L, np.shape(B)[2]), dtype=np.complex_)
-    TZB[tuple(np.meshgrid(np.arange(l[0], l[0] + L) % (2*L), np.arange(l[1], l[1] + L) % (2*L), np.arange(np.shape(B)[2])))] = B
+    ZB = np.zeros((2*L, 2*L, np.shape(B)[2]), dtype=np.complex_)
+    ZB[ :L, :L, :] = B
+    TZB = np.roll(ZB, l, axis=(0, 1))
     CTZB = TZB[ :L, :L, :]
     return CTZB
 
