@@ -16,13 +16,13 @@ from Utils.EM_funcs import EM, rearangeB, PsiPsi
 
 plt.close("all")
 
-np.random.seed(1)
+np.random.seed(100)
 rng = np.random.default_rng()
 F = np.random.rand(5, 5)
 L = np.shape(F)[0]
-F = 100 * F / np.linalg.norm(F)
+F = F / np.linalg.norm(F)
 W = 2*L - 1 # L for arbitrary spacing distribution, 2*L-1 for well-separated
-K = 1 # discretization of rotations
+K = 4 # discretization of rotations
 
 gamma = 0.04
 N = 500
@@ -42,7 +42,11 @@ M_clean, s, locs = generate_clean_micrograph_2d_rots_discrete(c, kvals, Bk, W, L
 
 gamma = s[0]*(L/N)**2
 
-sigma2 = 10
+SNR = 100
+
+sigma2 = 1 / (L**2 *SNR)
+
+
 
 M = M_clean + rng.normal(loc=0, scale=np.sqrt(sigma2), size=np.shape(M_clean))
 
@@ -61,10 +65,7 @@ for idx, Mm in enumerate(Mss_clean):
     
 M_empty = np.sum(Ms_clean, axis=(0,1))
 beta = np.sum(M_empty == 0) / Nd
-    
-F_init = np.random.rand(L, L)
-F_init = 100 * F_init / np.linalg.norm(F_init)
-_, z_init, _, _, _ = expand_fb(F_init, ne)
+
 
 rho_init = np.zeros((2*L, 2*L))
 for i in range(2*L):
@@ -73,5 +74,34 @@ for i in range(2*L):
         if i == L or j == L:
             rho_init[i, j] = beta / (4*L - 1)
 
-z, rho = EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2)
+z_est, rho_est = EM(Ms, z, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2)
 
+F_init = np.random.rand(L, L)
+F_init = F_init / np.linalg.norm(F_init)
+_, z_init, _, _, _ = expand_fb(F_init, ne)
+
+z_est, rho_est = EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2)
+
+F_init = np.random.rand(L, L)
+F_init = F_init / np.linalg.norm(F_init)
+_, z_init, _, _, _ = expand_fb(F_init, ne)
+
+z_est, rho_est = EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2)
+
+F_init = np.random.rand(L, L)
+F_init = F_init / np.linalg.norm(F_init)
+_, z_init, _, _, _ = expand_fb(F_init, ne)
+
+z_est, rho_est = EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2)
+
+F_init = np.random.rand(L, L)
+F_init = F_init / np.linalg.norm(F_init)
+_, z_init, _, _, _ = expand_fb(F_init, ne)
+
+z_est, rho_est = EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2)
+
+F_init = np.random.rand(L, L)
+F_init = F_init / np.linalg.norm(F_init)
+_, z_init, _, _, _ = expand_fb(F_init, ne)
+
+z_est, rho_est = EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2)
