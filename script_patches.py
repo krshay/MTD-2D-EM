@@ -30,11 +30,11 @@ N = 500
 N = (N // L) * L
 ne = 50
 B, z, roots, kvals, nu = expand_fb(F, ne)
-z = signal_prior(kvals)
-# T = calcT(nu, kvals)
+c, Gamma = signal_prior(kvals)
+T = calcT(nu, kvals)
 # BT = B @ T.H
 # c = np.real(T @ z)
-# z = T.H@c
+z = T.H@c
 Frec = np.reshape(np.real(B @ z), np.shape(F))
 Bk = np.zeros((2*L-1, 2*L-1, nu), dtype=np.complex_)
 for i in range(nu):
@@ -42,7 +42,7 @@ for i in range(nu):
 
 SNR = 10
 
-sigma2 = 1 / (L**2 *SNR)
+sigma2 = np.mean(Frec)**2 / (L**2 *SNR)
 
 Nd = int((N / L) ** 2)
 
@@ -66,10 +66,8 @@ for i in range(Nd):
 
 Ms = Ms_clean + np.random.normal(loc=0, scale=np.sqrt(sigma2), size=np.shape(Ms_clean))
 
-pM_k_best = EM(Ms, z, rho, L, K, Nd, B, Bk, roots, kvals, nu, sigma2)
+pM_k_best = EM(Ms, c, rho, L, K, Nd, B, Bk, roots, kvals, nu, sigma2, T, Gamma)
 
-F_init = np.random.rand(L, L)
-F_init = F_init / np.linalg.norm(F_init)
-_, z_init, _, _, _ = expand_fb(F_init, ne)
+c_init, _ = signal_prior(kvals)
 
-pM_k_est = EM(Ms, z_init, rho, L, K, Nd, B, Bk, roots, kvals, nu, sigma2)
+pM_k_est = EM(Ms, c_init, rho, L, K, Nd, B, Bk, roots, kvals, nu, sigma2, T, Gamma)

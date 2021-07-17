@@ -10,7 +10,9 @@ import itertools
 import scipy.special as spl
 from Utils.fb_funcs import rot_img_freq
 
-def EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2):
+def EM(Ms, c_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2, T, Gamma):
+    z_init = T.H @ c_init
+    c_k = c_init
     z_k = z_init
     rho_k = rho_init
     Phi = calc_Phi(K)
@@ -30,23 +32,24 @@ def EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2):
         log_likelihood = np.sum(np.log10(np.sum(likelihood_func_l_phi, axis=(0, 1, 2))))
         print(f'log-likelihood = {log_likelihood}')
         # rho_updated = rho_step(rho_k, pl_phi_k, Nd)
-        z_updated = z_step(z_k, pl_phi_k, Ms, B, L, K, Nd, nu, roots, kvals, PsiPsi_vals)
-        z_k = z_updated
-        print(z_k)
+        c_updated = z_step(c_k, pl_phi_k, Ms, B, L, K, Nd, nu, roots, kvals, sigma2, PsiPsi_vals, T, Gamma)
+        c_k = c_updated
+        z_k = T.H @ c_updated
         # rho_k = rho_updated
     return z_k, rho_k
         
-def z_step(z_k, pl_phi_k, Ms, B, L, K, Nd, nu, roots, kvals, PsiPsi_vals):
+def z_step(c_k, pl_phi_k, Ms, B, L, K, Nd, nu, roots, kvals, sigma2, PsiPsi_vals, T, Gamma):
     Phi = calc_Phi(K)
     Ls = calc_shifts(L)
     y = np.zeros((nu, ), dtype=np.complex_)
     A = np.zeros((nu, nu), dtype=np.complex_)
     for (iPhi, phi) in enumerate(Phi):
         for l in Ls:
-            y += np.diag(np.exp(-1j * kvals * phi)) @ (pl_phi_k[iPhi, l[0], l[1], :] @ \
-                np.einsum("ijm,ijn->mn", Ms, CTZB(B, l, L)))
-            A += np.diag(np.exp(-1j * kvals * phi)) @ (np.sum(pl_phi_k[iPhi, l[0], l[1], :]) * PsiPsi_vals[l[0], l[0], :, :])
-    return np.linalg.inv(A) @ y
+            y += (1/sigma2) * (np.diag(np.exp(-1j * kvals * phi)) @ (pl_phi_k[iPhi, l[0], l[1], :] @ \
+                np.einsum("ijm,ijn->mn", Ms, CTZB(B, l, L)))) @ T.H #### CHECK
+            A += (1/sigma2) * np.diag(np.exp(-1j * kvals * phi)) @ ((np.sum(pl_phi_k[iPhi, l[0], l[1], :]) * PsiPsi_vals[l[0], l[0], :, :]) @ T.H)
+    Afinal = A + np.linalg.inv(Gamma)
+    return np.linalg.inv(Afinal) @ y
 
 def rho_step(rho_k, pl_phi_k, Nd):
     return np.sum(pl_phi_k, axis=(0, 3)) / Nd
