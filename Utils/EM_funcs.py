@@ -23,17 +23,17 @@ def EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2):
             for l in Ls:
                 pM_k[iPhi, l[0], l[1], :] = np.real(pMm_l_phi_z(Ms, l, phi, z_k, kvals, Bk, L, sigma2, Nd))
         pM_k = pM_k / np.sum(pM_k, axis=(0, 1, 2))
-        likelihood_func_l_phi = pM_k * np.expand_dims(np.moveaxis(np.expand_dims(rho_k, 2),  [0,1,2], [1,2,0]), 3)
+
+        likelihood_func_l_phi = np.einsum("kijm,ij->kijm", pM_k, rho_k)
         pl_phi_k = likelihood_func_l_phi / np.sum(likelihood_func_l_phi, axis=(0, 1, 2))
         # pl_phi_k[np.isnan(pl_phi_k)] = 0 ## CHECK!!!
         log_likelihood = np.sum(np.log10(np.sum(likelihood_func_l_phi, axis=(0, 1, 2))))
         print(f'log-likelihood = {log_likelihood}')
-        break
-        rho_updated = rho_step(rho_k, pl_phi_k, Nd)
+        # rho_updated = rho_step(rho_k, pl_phi_k, Nd)
         z_updated = z_step(z_k, pl_phi_k, Ms, B, L, K, Nd, nu, roots, kvals, PsiPsi_vals)
         z_k = z_updated
         print(z_k)
-        rho_k = rho_updated
+        # rho_k = rho_updated
     return z_k, rho_k
         
 def z_step(z_k, pl_phi_k, Ms, B, L, K, Nd, nu, roots, kvals, PsiPsi_vals):
@@ -44,7 +44,7 @@ def z_step(z_k, pl_phi_k, Ms, B, L, K, Nd, nu, roots, kvals, PsiPsi_vals):
     for (iPhi, phi) in enumerate(Phi):
         for l in Ls:
             y += np.diag(np.exp(-1j * kvals * phi)) @ (pl_phi_k[iPhi, l[0], l[1], :] @ \
-                np.sum(np.repeat(Ms[:, :, :, np.newaxis], nu, axis=3) * np.repeat(CTZB(B, l, L)[ :, :, np.newaxis, :], np.shape(Ms)[2], axis=(2)), axis=(0, 1)))
+                np.einsum("ijm,ijn->mn", Ms, CTZB(B, l, L)))
             A += np.diag(np.exp(-1j * kvals * phi)) @ (np.sum(pl_phi_k[iPhi, l[0], l[1], :]) * PsiPsi_vals[l[0], l[0], :, :])
     return np.linalg.inv(A) @ y
 
@@ -76,17 +76,6 @@ def calc_Phi(K):
 
 def calc_shifts(L):
     return list(itertools.product(np.arange(2*L), np.arange(2*L)))
-
-# def calc_corresponding_kvals(kvals):
-#     corresponding_kvals = np.zeros_like(kvals)
-#     for ii in range(len(kvals)):
-#         if kvals[ii] > 0:
-#             corresponding_kvals[ii] = ii + 1
-#         elif kvals[ii] < 0:
-#             corresponding_kvals[ii] = ii - 1
-#         else:
-#             corresponding_kvals[ii] = ii
-#     return corresponding_kvals
 
 def rearangeB(B):
     return np.reshape(B, (int(np.sqrt(np.shape(B)[0])), int(np.sqrt(np.shape(B)[0])), np.shape(B)[1]))
