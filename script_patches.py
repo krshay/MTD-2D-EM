@@ -18,12 +18,12 @@ from Utils.prior_funcs import signal_prior
 
 plt.close("all")
 
-np.random.seed(1)
-F = np.random.rand(25, 25)
+np.random.seed(10)
+F = np.random.rand(5, 5)
 L = np.shape(F)[0]
 F = F / np.linalg.norm(F)
 W = 2*L - 1 # L for arbitrary spacing distribution, 2*L-1 for well-separated
-K = 1 # discretization of rotations
+K = 10 # discretization of rotations
 
 gamma = 0.04
 N = 500
@@ -40,7 +40,7 @@ Bk = np.zeros((2*L-1, 2*L-1, nu), dtype=np.complex_)
 for i in range(nu):
     Bk[ :, :, i] = np.fft.fft2(np.pad(np.reshape(B[ :, i], (L, L)), L//2))
 
-SNR = 10
+SNR = 1
 
 sigma2 = np.mean(Frec)**2 / (L**2 *SNR)
 
@@ -66,8 +66,8 @@ for i in range(Nd):
 
 Ms = Ms_clean + np.random.normal(loc=0, scale=np.sqrt(sigma2), size=np.shape(Ms_clean))
 
-pM_k_best = EM(Ms, c, rho, L, K, Nd, B, Bk, roots, kvals, nu, sigma2, T, Gamma)
+# z_k_best, pM_k_best = EM(Ms, c, rho, L, K, Nd, B, Bk, roots, kvals, nu, sigma2, T, Gamma)
 
 c_init, _ = signal_prior(kvals)
 
-pM_k_est = EM(Ms, c_init, rho, L, K, Nd, B, Bk, roots, kvals, nu, sigma2, T, Gamma)
+z_k_est, pM_k_est = EM(Ms, c_init, np.array([[1]]), L, K, Nd, B, Bk, roots, kvals, nu, sigma2, T, Gamma)
