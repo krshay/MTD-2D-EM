@@ -15,6 +15,7 @@ from Utils.psf_tsf_funcs import full_psf_2d, full_tsf_2d, makeExtraMat, maketsfM
 from Utils.EM_funcs import EM, rearangeB, PsiPsi, CTZ, calc_shifts, calc_Phi
 from Utils.fb_funcs import rot_img_freq
 from Utils.prior_funcs import signal_prior
+from Utils.fb_funcs import min_err_coeffs
 
 plt.close("all")
 
@@ -23,12 +24,12 @@ F = np.random.rand(5, 5)
 L = np.shape(F)[0]
 F = F / np.linalg.norm(F)
 W = 2*L - 1 # L for arbitrary spacing distribution, 2*L-1 for well-separated
-K = 10 # discretization of rotations
+K = 4 # discretization of rotations
 
 gamma = 0.04
 N = 500
 N = (N // L) * L
-ne = 50
+ne = 34
 B, z, roots, kvals, nu = expand_fb(F, ne)
 c, Gamma = signal_prior(kvals)
 T = calcT(nu, kvals)
@@ -40,7 +41,7 @@ Bk = np.zeros((2*L-1, 2*L-1, nu), dtype=np.complex_)
 for i in range(nu):
     Bk[ :, :, i] = np.fft.fft2(np.pad(np.reshape(B[ :, i], (L, L)), L//2))
 
-SNR = 1
+SNR = 500
 
 sigma2 = np.mean(Frec)**2 / (L**2 *SNR)
 
@@ -70,4 +71,7 @@ Ms = Ms_clean + np.random.normal(loc=0, scale=np.sqrt(sigma2), size=np.shape(Ms_
 
 c_init, _ = signal_prior(kvals)
 
-z_k_est, pM_k_est = EM(Ms, c_init, np.array([[1]]), L, K, Nd, B, Bk, roots, kvals, nu, sigma2, T, Gamma)
+z_k_est, pM_k_est = EM(Ms, c_init, rho, L, K, Nd, B, Bk, roots, kvals, nu, sigma2, T, Gamma)
+
+err = min_err_coeffs(z, z_k_est, kvals)
+print(err[0])
