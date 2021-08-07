@@ -24,12 +24,12 @@ F = np.random.rand(5, 5)
 L = np.shape(F)[0]
 F = F / np.linalg.norm(F)
 W = 2*L - 1 # L for arbitrary spacing distribution, 2*L-1 for well-separated
-K = 4 # discretization of rotations
+K = 3 # discretization of rotations
 
 gamma = 0.04
-N = 500
+N = 1000
 N = (N // L) * L
-ne = 34
+ne = 50
 B, z, roots, kvals, nu = expand_fb(F, ne)
 c, Gamma = signal_prior(kvals)
 T = calcT(nu, kvals)
@@ -41,7 +41,7 @@ Bk = np.zeros((2*L-1, 2*L-1, nu), dtype=np.complex_)
 for i in range(nu):
     Bk[ :, :, i] = np.fft.fft2(np.pad(np.reshape(B[ :, i], (L, L)), L//2))
 
-SNR = 500
+SNR = 10
 
 sigma2 = np.mean(Frec)**2 / (L**2 *SNR)
 
@@ -61,17 +61,29 @@ for i in range(Nd):
     Ms_clean[ :, :, i] = np.real(CTZ(F_phi, l_i, L))
     rho[l_i[0], l_i[1]] = rho[l_i[0], l_i[1]] + 1 / Nd
     
-# beta = np.sum(np.sum(Ms_clean, axis=(0, 1)) == 0) / Nd
-# rho[ L, :] = beta / (4*L - 1)
-# rho[ :, L] = beta / (4*L - 1)
+beta = np.sum(np.sum(Ms_clean, axis=(0, 1)) == 0) / Nd
+rho[ L, :] = beta / (4*L - 1)
+rho[ :, L] = beta / (4*L - 1)
 
 Ms = Ms_clean + np.random.normal(loc=0, scale=np.sqrt(sigma2), size=np.shape(Ms_clean))
 
 # z_k_best, pM_k_best = EM(Ms, c, rho, L, K, Nd, B, Bk, roots, kvals, nu, sigma2, T, Gamma)
 
 c_init, _ = signal_prior(kvals)
+z_init = T.H @ c_init
+c_init = c + 0.2
+z_init = T.H @ c_init
 
+_, z_init, _, _, _ = expand_fb(Frec + 7*np.random.rand(np.shape(Frec)[0], np.shape(Frec)[1]), ne)
+c_init = T @ z_init
 z_k_est, pM_k_est = EM(Ms, c_init, rho, L, K, Nd, B, Bk, roots, kvals, nu, sigma2, T, Gamma)
 
 err = min_err_coeffs(z, z_k_est, kvals)
 print(err[0])
+
+plt.figure()
+plt.imshow(Frec)
+plt.figure()
+plt.imshow(np.reshape(np.real(B @ z_init), np.shape(F)))
+plt.figure()
+plt.imshow(np.reshape(np.real(B @ z_k_est), np.shape(F)))
