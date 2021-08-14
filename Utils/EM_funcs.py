@@ -21,7 +21,8 @@ def EM(Ms, c_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2, T, Gamma
     S = np.zeros((K, 2*L, 2*L, Nd)) # np.zeros((K, 1, 1, Nd)) # 
     B = rearangeB(B)
     PsiPsi_vals = PsiPsi(B, L, K, nu, kvals)
-    for _ in range(20):
+    log_likelihood_prev = 0
+    for ii in range(7):
         for (iPhi, phi) in enumerate(Phi):
             for l in Ls:
                 S[iPhi, l[0], l[1], :] = np.real(pMm_l_phi_z(Ms, l, phi, z_k, kvals, Bk, L, sigma2, Nd))
@@ -30,7 +31,7 @@ def EM(Ms, c_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2, T, Gamma
         pM_k_likelihood = np.exp(-S / (2 * sigma2))
         # pM_k_likelihood = pM_k / np.sum(pM_k, axis=(0, 1, 2))
         pM_k = pM_k / np.sum(pM_k, axis=(0, 1, 2))
-        likelihood_func_l_phi = np.einsum("kijm,ij->kijm", pM_k, rho_k)
+        likelihood_func_l_phi = np.einsum("Pijm,ij->Pijm", pM_k, rho_k)
         likelihood_func_temp = np.einsum("kijm,ij->kijm", pM_k_likelihood, rho_k)
         pl_phi_k = likelihood_func_l_phi / np.sum(likelihood_func_l_phi, axis=(0, 1, 2))
         log_likelihood = np.sum(np.log(np.sum(likelihood_func_temp, axis=(0, 1, 2))))
@@ -41,6 +42,10 @@ def EM(Ms, c_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2, T, Gamma
         # z_k = T.H @ c_updated
         print(z_k[0])
         z_k = z_updated
+        if ii > 0:
+            if log_likelihood < log_likelihood_prev:
+                print("Something is wrong.")
+        log_likelihood_prev = log_likelihood
 
         # rho_k = rho_updated
     return z_k, pM_k

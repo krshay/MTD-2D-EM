@@ -19,7 +19,7 @@ from Utils.fb_funcs import min_err_coeffs
 
 plt.close("all")
 
-np.random.seed(100)
+np.random.seed(1)
 F = np.random.rand(5, 5)
 L = np.shape(F)[0]
 F = F / np.linalg.norm(F)
@@ -55,11 +55,15 @@ Ls = calc_shifts(L)
 Phis = calc_Phi(K)
 Ms_clean = np.zeros((L, L, Nd))
 
+eta = np.zeros((Nd, ))
+
 for i in range(Nd):
     l_i = Ls[np.random.randint(0, len(Ls))]
-    F_phi = rot_img_freq(Phis[np.random.randint(0, K)], z, kvals, Bk, L)
+    phi = Phis[np.random.randint(0, K)]
+    F_phi = rot_img_freq(phi, z, kvals, Bk, L)
     Ms_clean[ :, :, i] = np.real(CTZ(F_phi, l_i, L))
     rho[l_i[0], l_i[1]] = rho[l_i[0], l_i[1]] + 1 / Nd
+    eta[i] = phi
     
 beta = np.sum(np.sum(Ms_clean, axis=(0, 1)) == 0) / Nd
 rho[ L, :] = beta / (4*L - 1)
@@ -69,12 +73,12 @@ Ms = Ms_clean + np.random.normal(loc=0, scale=np.sqrt(sigma2), size=np.shape(Ms_
 
 # z_k_best, pM_k_best = EM(Ms, c, rho, L, K, Nd, B, Bk, roots, kvals, nu, sigma2, T, Gamma)
 
-c_init, _ = signal_prior(kvals)
-z_init = T.H @ c_init
-c_init = c + 0.2
-z_init = T.H @ c_init
+# c_init, _ = signal_prior(kvals)
+# z_init = T.H @ c_init
+# c_init = c + 0.2
+# z_init = T.H @ c_init
 
-_, z_init, _, _, _ = expand_fb(Frec + 7*np.random.rand(np.shape(Frec)[0], np.shape(Frec)[1]), ne)
+_, z_init, _, _, _ = expand_fb(Frec + 2*np.random.rand(np.shape(Frec)[0], np.shape(Frec)[1]), ne)
 c_init = T @ z_init
 z_k_est, pM_k_est = EM(Ms, c_init, rho, L, K, Nd, B, Bk, roots, kvals, nu, sigma2, T, Gamma)
 
