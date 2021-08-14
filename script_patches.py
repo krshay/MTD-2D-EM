@@ -19,17 +19,17 @@ from Utils.fb_funcs import min_err_coeffs
 
 plt.close("all")
 
-np.random.seed(10)
+np.random.seed(100)
 F = np.random.rand(5, 5)
 L = np.shape(F)[0]
 F = F / np.linalg.norm(F)
 W = 2*L - 1 # L for arbitrary spacing distribution, 2*L-1 for well-separated
-K = 3 # discretization of rotations
+K = 1 # discretization of rotations
 
 gamma = 0.04
-N = 1000
+N = 500
 N = (N // L) * L
-ne = 50
+ne = 10
 B, z, roots, kvals, nu = expand_fb(F, ne)
 c, Gamma = signal_prior(kvals)
 T = calcT(nu, kvals)
@@ -41,7 +41,7 @@ Bk = np.zeros((2*L-1, 2*L-1, nu), dtype=np.complex_)
 for i in range(nu):
     Bk[ :, :, i] = np.fft.fft2(np.pad(np.reshape(B[ :, i], (L, L)), L//2))
 
-SNR = 10
+SNR = 1
 
 sigma2 = np.mean(Frec)**2 / (L**2 *SNR)
 

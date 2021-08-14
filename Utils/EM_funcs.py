@@ -21,7 +21,7 @@ def EM(Ms, c_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2, T, Gamma
     S = np.zeros((K, 2*L, 2*L, Nd)) # np.zeros((K, 1, 1, Nd)) # 
     B = rearangeB(B)
     PsiPsi_vals = PsiPsi(B, L, K, nu, kvals)
-    for _ in range(5):
+    for _ in range(20):
         for (iPhi, phi) in enumerate(Phi):
             for l in Ls:
                 S[iPhi, l[0], l[1], :] = np.real(pMm_l_phi_z(Ms, l, phi, z_k, kvals, Bk, L, sigma2, Nd))
