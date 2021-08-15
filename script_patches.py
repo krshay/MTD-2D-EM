@@ -24,10 +24,10 @@ F = np.random.rand(5, 5)
 L = np.shape(F)[0]
 F = F / np.linalg.norm(F)
 W = 2*L - 1 # L for arbitrary spacing distribution, 2*L-1 for well-separated
-K = 1 # discretization of rotations
+K = 10 # discretization of rotations
 
 gamma = 0.04
-N = 500
+N = 700
 N = (N // L) * L
 ne = 10
 B, z, roots, kvals, nu = expand_fb(F, ne)
@@ -78,7 +78,7 @@ Ms = Ms_clean + np.random.normal(loc=0, scale=np.sqrt(sigma2), size=np.shape(Ms_
 # c_init = c + 0.2
 # z_init = T.H @ c_init
 
-_, z_init, _, _, _ = expand_fb(Frec + 2*np.random.rand(np.shape(Frec)[0], np.shape(Frec)[1]), ne)
+_, z_init, _, _, _ = expand_fb(Frec + 7*np.random.rand(np.shape(Frec)[0], np.shape(Frec)[1]), ne)
 c_init = T @ z_init
 z_k_est, pM_k_est = EM(Ms, c_init, rho, L, K, Nd, B, Bk, roots, kvals, nu, sigma2, T, Gamma)
 

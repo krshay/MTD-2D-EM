@@ -22,7 +22,7 @@ def EM(Ms, c_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2, T, Gamma
     B = rearangeB(B)
     PsiPsi_vals = PsiPsi(B, L, K, nu, kvals)
     log_likelihood_prev = 0
-    for ii in range(7):
+    for ii in range(5):
         for (iPhi, phi) in enumerate(Phi):
             for l in Ls:
                 S[iPhi, l[0], l[1], :] = np.real(pMm_l_phi_z(Ms, l, phi, z_k, kvals, Bk, L, sigma2, Nd))
@@ -56,7 +56,7 @@ def z_step(c_k, pl_phi_k, Ms, B, L, K, Nd, nu, roots, kvals, sigma2, PsiPsi_vals
     y = np.zeros((nu, ), dtype=np.complex_)
     A = np.zeros((nu, nu), dtype=np.complex_)
     for (iPhi, phi) in enumerate(Phi):
-        Bphi = np.einsum("ijk,kl->ijk", B, np.diag(np.exp(-1j * kvals * phi)))
+        Bphi = np.einsum("ijk,kl->ijk", B, np.diag(np.exp(1j * kvals * phi)))
         for l in Ls:
             y += (1/sigma2) * np.einsum("k,ki->i", pl_phi_k[iPhi, l[0], l[1], :], \
                 np.einsum("ijm,ijn->mn", Ms, CTZB(Bphi, l, L))) #### CHECK
@@ -108,7 +108,7 @@ def PsiPsi(B, L, K, nu, kvals):
     Ls = calc_shifts(L)
     Phi = calc_Phi(K)
     for (iPhi, phi) in enumerate(Phi):
-        Bphi = np.einsum("ijk,kl->ijk", B, np.diag(np.exp(-1j * kvals * phi)))
+        Bphi = np.einsum("ijk,kl->ijk", B, np.diag(np.exp(1j * kvals * phi)))
         for l in Ls:
             B_CTZ = CTZB(Bphi, l, L)
             for i in range(nu):
