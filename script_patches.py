@@ -12,7 +12,7 @@ from Utils.fb_funcs import expand_fb, calcT
 from Utils.generate_clean_micrograph_2d import generate_clean_micrograph_2d_rots_discrete
 from Utils.funcs_calc_moments import M2_2d, M3_2d
 from Utils.psf_tsf_funcs import full_psf_2d, full_tsf_2d, makeExtraMat, maketsfMat
-from Utils.EM_funcs import EM, rearangeB, PsiPsi, CTZ, calc_shifts, calc_Phi
+from Utils.EM_funcs import EM, EM_knownrho, rearangeB, PsiPsi, CTZ, calc_shifts, calc_Phi
 from Utils.fb_funcs import rot_img_freq
 from Utils.prior_funcs import signal_prior
 from Utils.fb_funcs import min_err_coeffs
@@ -24,7 +24,7 @@ F = np.random.rand(5, 5)
 L = np.shape(F)[0]
 F = F / np.linalg.norm(F)
 W = 2*L - 1 # L for arbitrary spacing distribution, 2*L-1 for well-separated
-K = 10 # discretization of rotations
+K = 3 # discretization of rotations
 
 gamma = 0.04
 N = 700
@@ -71,19 +71,26 @@ rho[ :, L] = beta / (4*L - 1)
 
 Ms = Ms_clean + np.random.normal(loc=0, scale=np.sqrt(sigma2), size=np.shape(Ms_clean))
 
-# z_k_best, pM_k_best = EM(Ms, c, rho, L, K, Nd, B, Bk, roots, kvals, nu, sigma2, T, Gamma)
-
-# c_init, _ = signal_prior(kvals)
-# z_init = T.H @ c_init
-# c_init = c + 0.2
-# z_init = T.H @ c_init
-
+beta0 = 0.25
+rho_init = np.zeros((2*L, 2*L))
+for i in range(2*L):
+    for j in range(2*L):
+        rho_init[i, j] = (1 - beta0) / (2*L - 1)**2
+        if i == L or j == L:
+            rho_init[i, j] = beta0 / (4*L - 1)
+            
 _, z_init, _, _, _ = expand_fb(Frec + 7*np.random.rand(np.shape(Frec)[0], np.shape(Frec)[1]), ne)
 c_init = T @ z_init
-z_k_est, pM_k_est = EM(Ms, c_init, rho, L, K, Nd, B, Bk, roots, kvals, nu, sigma2, T, Gamma)
+z_k_est, pM_k_est = EM_knownrho(Ms, c_init, rho, L, K, Nd, B, Bk, roots, kvals, nu, sigma2, T, Gamma)
+
+z_k_est1, rho_k_est1 = EM(Ms, c_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2, T, Gamma)
+
 
 err = min_err_coeffs(z, z_k_est, kvals)
 print(err[0])
+
+err1 = min_err_coeffs(z, z_k_est1, kvals)
+print(err1[0])
 
 plt.figure()
 plt.imshow(Frec)

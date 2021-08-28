@@ -12,12 +12,13 @@ from Utils.fb_funcs import expand_fb, calcT
 from Utils.generate_clean_micrograph_2d import generate_clean_micrograph_2d_rots_discrete
 from Utils.funcs_calc_moments import M2_2d, M3_2d
 from Utils.psf_tsf_funcs import full_psf_2d, full_tsf_2d, makeExtraMat, maketsfMat
-from Utils.EM_funcs import EM, rearangeB, PsiPsi
-
+from Utils.EM_funcs import EM, EM_knownrho, rearangeB, PsiPsi, CTZ, calc_shifts, calc_Phi
+from Utils.fb_funcs import rot_img_freq
+from Utils.prior_funcs import signal_prior
+from Utils.fb_funcs import min_err_coeffs
 plt.close("all")
 
-np.random.seed(100)
-rng = np.random.default_rng()
+np.random.seed(1)
 F = np.random.rand(5, 5)
 L = np.shape(F)[0]
 F = F / np.linalg.norm(F)
@@ -25,13 +26,14 @@ W = 2*L - 1 # L for arbitrary spacing distribution, 2*L-1 for well-separated
 K = 4 # discretization of rotations
 
 gamma = 0.04
-N = 500
+N = 950
 N = (N // L) * L
-ne = 50
+ne = 10
 B, z, roots, kvals, nu = expand_fb(F, ne)
+c, Gamma = signal_prior(kvals)
 T = calcT(nu, kvals)
-BT = B @ T.H
-c = np.real(T @ z)
+# BT = B @ T.H
+# c = np.real(T @ z)
 z = T.H@c
 Frec = np.reshape(np.real(B @ z), np.shape(F))
 Bk = np.zeros((2*L-1, 2*L-1, nu), dtype=np.complex_)
@@ -42,13 +44,11 @@ M_clean, s, locs = generate_clean_micrograph_2d_rots_discrete(c, kvals, Bk, W, L
 
 gamma = s[0]*(L/N)**2
 
-SNR = 100
+SNR = 0.5
 
 sigma2 = 1 / (L**2 *SNR)
 
-
-
-M = M_clean + rng.normal(loc=0, scale=np.sqrt(sigma2), size=np.shape(M_clean))
+M = M_clean + np.random.normal(loc=0, scale=np.sqrt(sigma2), size=np.shape(M_clean))
 
 Nd = int((N / L) ** 2)
 Mss = [np.array_split(Mm, np.sqrt(Nd), axis=1) for Mm in np.array_split(M, np.sqrt(Nd), axis=0)]
@@ -66,42 +66,19 @@ for idx, Mm in enumerate(Mss_clean):
 M_empty = np.sum(Ms_clean, axis=(0,1))
 beta = np.sum(M_empty == 0) / Nd
 
-
+beta0 = 0.90
 rho_init = np.zeros((2*L, 2*L))
 for i in range(2*L):
     for j in range(2*L):
-        rho_init[i, j] = (1 - beta) / (2*L - 1)**2
+        rho_init[i, j] = (1 - beta0) / (2*L - 1)**2
         if i == L or j == L:
-            rho_init[i, j] = beta / (4*L - 1)
+            rho_init[i, j] = beta0 / (4*L - 1)
 
-z_est, rho_est = EM(Ms, z, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2)
+_, z_init, _, _, _ = expand_fb(Frec + 7*np.random.rand(np.shape(Frec)[0], np.shape(Frec)[1]), ne)
+c_init = T @ z_init
 
-F_init = np.random.rand(L, L)
-F_init = F_init / np.linalg.norm(F_init)
-_, z_init, _, _, _ = expand_fb(F_init, ne)
+z_est, rho_est = EM(Ms, c_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2, T, Gamma)
 
-z_est, rho_est = EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2)
+err = min_err_coeffs(z, z_est, kvals)
+print(err[0])
 
-F_init = np.random.rand(L, L)
-F_init = F_init / np.linalg.norm(F_init)
-_, z_init, _, _, _ = expand_fb(F_init, ne)
-
-z_est, rho_est = EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2)
-
-F_init = np.random.rand(L, L)
-F_init = F_init / np.linalg.norm(F_init)
-_, z_init, _, _, _ = expand_fb(F_init, ne)
-
-z_est, rho_est = EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2)
-
-F_init = np.random.rand(L, L)
-F_init = F_init / np.linalg.norm(F_init)
-_, z_init, _, _, _ = expand_fb(F_init, ne)
-
-z_est, rho_est = EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2)
-
-F_init = np.random.rand(L, L)
-F_init = F_init / np.linalg.norm(F_init)
-_, z_init, _, _, _ = expand_fb(F_init, ne)
-
-z_est, rho_est = EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2)
