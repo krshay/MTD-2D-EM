@@ -7,40 +7,35 @@ Created on Fri Jun 25 11:18:47 2021
 
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy
 from Utils.fb_funcs import expand_fb, calcT
-from Utils.generate_clean_micrograph_2d import generate_clean_micrograph_2d_rots_discrete
-from Utils.funcs_calc_moments import M2_2d, M3_2d
-from Utils.psf_tsf_funcs import full_psf_2d, full_tsf_2d, makeExtraMat, maketsfMat
-from Utils.EM_funcs import EM, EM_knownrho, rearangeB, PsiPsi, CTZ, calc_shifts, calc_Phi
-from Utils.fb_funcs import rot_img_freq
-from Utils.prior_funcs import signal_prior
+from Utils.generate_clean_micrograph_2d import generate_clean_micrograph_2d_rots
+from Utils.EM_funcs import EM
 from Utils.fb_funcs import min_err_coeffs
 plt.close("all")
 
 np.random.seed(1)
 F = np.random.rand(5, 5)
 L = np.shape(F)[0]
-F = F / np.linalg.norm(F)
+F = 10 * F / np.linalg.norm(F)
 W = 2*L - 1 # L for arbitrary spacing distribution, 2*L-1 for well-separated
 K = 4 # discretization of rotations
 
 gamma = 0.04
-N = 950
+N = 1000
 N = (N // L) * L
 ne = 10
 B, z, roots, kvals, nu = expand_fb(F, ne)
-c, Gamma = signal_prior(kvals)
+# c, Gamma = signal_prior(kvals)
 T = calcT(nu, kvals)
 # BT = B @ T.H
-# c = np.real(T @ z)
-z = T.H@c
+c = np.real(T @ z)
+# z = T.H@c
 Frec = np.reshape(np.real(B @ z), np.shape(F))
 Bk = np.zeros((2*L-1, 2*L-1, nu), dtype=np.complex_)
 for i in range(nu):
     Bk[ :, :, i] = np.fft.fft2(np.pad(np.reshape(B[ :, i], (L, L)), L//2))
 
-M_clean, s, locs = generate_clean_micrograph_2d_rots_discrete(c, kvals, Bk, W, L, N, gamma*(N/L)**2, T, K, seed=100)
+M_clean, s, locs = generate_clean_micrograph_2d_rots(c, kvals, Bk, W, L, N, gamma*(N/L)**2, T, seed=100)
 
 gamma = s[0]*(L/N)**2
 
@@ -74,10 +69,12 @@ for i in range(2*L):
         if i == L or j == L:
             rho_init[i, j] = beta0 / (4*L - 1)
 
-_, z_init, _, _, _ = expand_fb(Frec + 7*np.random.rand(np.shape(Frec)[0], np.shape(Frec)[1]), ne)
+F_init = np.random.rand(5, 5)
+F_init = 10 * F_init / np.linalg.norm(F_init)
+_, z_init, _, _, _ = expand_fb(F_init, ne)
 c_init = T @ z_init
 
-z_est, rho_est = EM(Ms, c_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2, T, Gamma)
+z_est, rho_est = EM(Ms, c_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2, T)
 
 err = min_err_coeffs(z, z_est, kvals)
 print(err[0])
