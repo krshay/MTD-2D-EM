@@ -25,11 +25,9 @@ N = 1000
 N = (N // L) * L
 ne = 10
 B, z, roots, kvals, nu = expand_fb(F, ne)
-# c, Gamma = signal_prior(kvals)
 T = calcT(nu, kvals)
-# BT = B @ T.H
 c = np.real(T @ z)
-# z = T.H@c
+
 Frec = np.reshape(np.real(B @ z), np.shape(F))
 Bk = np.zeros((2*L-1, 2*L-1, nu), dtype=np.complex_)
 for i in range(nu):
@@ -72,9 +70,8 @@ for i in range(2*L):
 F_init = np.random.rand(5, 5)
 F_init = 10 * F_init / np.linalg.norm(F_init)
 _, z_init, _, _, _ = expand_fb(F_init, ne)
-c_init = T @ z_init
 
-z_est, rho_est = EM(Ms, c_init, rho_init, L, K, Nd, B, Bk, roots, kvals, nu, sigma2, T)
+z_est, rho_est = EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2)
 
 err = min_err_coeffs(z, z_est, kvals)
 print(err[0])
