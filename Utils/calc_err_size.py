@@ -78,6 +78,7 @@ def calc_err_size_both(L, ne, sizes, SNR, gamma, K, sd):
 
     # %% calculations
     for (idx, sz) in enumerate(sizes):
+        sz = (sz // L) * L
         y_clean, s, locs = generate_clean_micrograph_2d_rots(c, kvals, Bk, W, L, sz, gamma*(sz/L)**2, T, seed=sd)
         y = y_clean + np.random.default_rng().normal(loc=0, scale=np.sqrt(sigma2), size=np.shape(y_clean))
         del y_clean
