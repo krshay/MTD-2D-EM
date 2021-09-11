@@ -67,7 +67,7 @@ def calc_err_size_both(L, ne, sizes, SNR, gamma, K, sd):
                 rho_init[i, j] = beta0 / (4*L - 1)
 
     cs = np.zeros((NumGuesses, ne))
-    zs = np.zeros((NumGuesses, ne))
+    zs = np.zeros((NumGuesses, ne), dtype=np.complex_)
     for jj in range(NumGuesses):
         X_initial = np.random.rand(L, L)
         X_initial = 10 * X_initial / np.linalg.norm(X_initial)
@@ -105,7 +105,7 @@ def calc_err_size_both(L, ne, sizes, SNR, gamma, K, sd):
         
         for jj in range(NumGuesses):
             startac = time.time()
-            X_est_ac, _, _ = Utils.optimization_funcs_rot.optimize_2d(np.concatenate((np.reshape(gamma_initial, (1,)), cs[jj, :])), Bk, T, kvals, M1_y, M2_y, M3_y, sigma2, L, 1) 
+            X_est_ac = Utils.optimization_funcs_rot.optimize_2d(np.concatenate((np.reshape(gamma_initial, (1,)), cs[jj, :])), Bk, T, kvals, M1_y, M2_y, M3_y, sigma2, L, 1) 
             stopac = time.time() - startac
             c_est_ac = X_est_ac.x[1:]
             z_est_ac = T.H @ c_est_ac
