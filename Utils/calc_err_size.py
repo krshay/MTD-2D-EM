@@ -79,6 +79,7 @@ def calc_err_size_both(L, ne, sizes, SNR, gamma, K, sd):
     # %% calculations
     for (idx, sz) in enumerate(sizes):
         sz = (sz // L) * L
+        print(f'iter #{sd}, size = {sz}')
         y_clean, s, locs = generate_clean_micrograph_2d_rots(c, kvals, Bk, W, L, sz, gamma*(sz/L)**2, T, seed=sd)
         y = y_clean + np.random.default_rng().normal(loc=0, scale=np.sqrt(sigma2), size=np.shape(y_clean))
         del y_clean
@@ -129,5 +130,16 @@ def calc_err_size_both(L, ne, sizes, SNR, gamma, K, sd):
             z_est, rho_est = EM(Ms, zs[jj, :], rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2)
             stopEM = time.time() - startEM
             times_EM[idx, jj] = time_split + stopEM
-        
+        np.save(f'errs_EM_sd{sd}_idx{idx}.npy', errs_EM)
+        np.save(f'costs_EM_sd{sd}_idx{idx}.npy', costs_EM)
+        np.save(f'times_EM_sd{sd}_idx{idx}.npy', times_EM)
+        np.save(f'errs_ac_sd{sd}_idx{idx}.npy', errs_ac)
+        np.save(f'costs_ac_sd{sd}_idx{idx}.npy', costs_ac)
+        np.save(f'times_ac_sd{sd}_idx{idx}.npy', times_ac)
+    np.save(f'errs_EM_sd{sd}.npy', errs_EM)
+    np.save(f'costs_EM_sd{sd}.npy', costs_EM)
+    np.save(f'times_EM_sd{sd}.npy', times_EM)
+    np.save(f'errs_ac_sd{sd}.npy', errs_ac)
+    np.save(f'costs_ac_sd{sd}.npy', costs_ac)
+    np.save(f'times_ac_sd{sd}.npy', times_ac)
     return errs_EM, costs_EM, times_EM, errs_ac, costs_ac, times_ac
