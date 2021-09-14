@@ -24,7 +24,6 @@ if __name__ == '__main__':
     gamma = 0.04
     K = 16
     num_cpus = mp.cpu_count()
-    num_cpus = 5
     # %% EM and Autocorrelation Analysis
     pool = mp.Pool(num_cpus)
     S = pool.starmap(calc_err_size_both, [[L, ne, sizes, SNR, gamma, K, i] for i in range(Niters)])
