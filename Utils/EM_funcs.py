@@ -40,7 +40,7 @@ def EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2):
             break
         log_likelihood_prev = log_likelihood
         count += 1
-    return z_k, rho_k
+    return z_k, rho_k, log_likelihood
         
 def z_step(pl_phi_k, Ms, B, L, K, nu, kvals, sigma2, PsiPsi_vals):
     Phi = calc_Phi(K)

@@ -39,7 +39,6 @@ def calc_err_size_both(L, ne, sizes, SNR, gamma, K, sd):
     errs_ac = np.zeros((len(sizes), NumGuesses))
     costs_ac = np.zeros((len(sizes), NumGuesses))
     times_ac = np.zeros((len(sizes), NumGuesses))
-    
     sigma2 = 1 / (L**2 *SNR)
     
     X = np.random.rand(L, L)
@@ -122,13 +121,16 @@ def calc_err_size_both(L, ne, sizes, SNR, gamma, K, sd):
         Mss = [np.array_split(Mm, np.sqrt(Nd), axis=1) for Mm in np.array_split(y, np.sqrt(Nd), axis=0)]
         Mss = [item for sublist in Mss for item in sublist]
         Ms = np.zeros((L, L, Nd))
-        for idx, Mm in enumerate(Mss):
-            Ms[ :, :, idx] = Mm
+        for idxx, Mm in enumerate(Mss):
+            Ms[ :, :, idxx] = Mm
         time_split = time.time() - start_split
         for jj in range(NumGuesses):
             startEM = time.time()
-            z_est, rho_est = EM(Ms, zs[jj, :], rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2)
+            z_est_EM, rho_est_EM, log_likelihood_EM = EM(Ms, zs[jj, :], rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2)
             stopEM = time.time() - startEM
+            est_err_coeffs_EM = min_err_coeffs(z, z_est_EM, kvals)
+            errs_EM[idx, jj] = est_err_coeffs_EM[0]
+            costs_EM[idx, jj] = log_likelihood_EM
             times_EM[idx, jj] = time_split + stopEM
         np.save(f'errs_EM_sd{sd}_idx{idx}.npy', errs_EM)
         np.save(f'costs_EM_sd{sd}_idx{idx}.npy', costs_EM)
