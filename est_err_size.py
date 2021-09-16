@@ -17,10 +17,10 @@ if __name__ == '__main__':
     Niters = 40
     L = 5
     ne = 10
-    Nsizes = 5
+    Nsizes = 8
     sizes = np.logspace(np.log10(500), np.log10(3000), Nsizes).astype(int)
     
-    SNR = 1
+    SNR = 0.1
     gamma = 0.04
     K = 16
     num_cpus = mp.cpu_count()

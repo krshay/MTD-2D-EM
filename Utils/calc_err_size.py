@@ -39,10 +39,11 @@ def calc_err_size_both(L, ne, sizes, SNR, gamma, K, sd):
     errs_ac = np.zeros((len(sizes), NumGuesses))
     costs_ac = np.zeros((len(sizes), NumGuesses))
     times_ac = np.zeros((len(sizes), NumGuesses))
-    sigma2 = 1 / (L**2 *SNR)
     
     X = np.random.rand(L, L)
     X = 10 * X / np.linalg.norm(X)
+    
+    sigma2 = np.linalg.norm(X)**2 / (L**2 *SNR)
     
     W = 2*L - 1 # L for arbitrary spacing distribution, 2*L-1 for well-separated
 
@@ -78,7 +79,6 @@ def calc_err_size_both(L, ne, sizes, SNR, gamma, K, sd):
     # %% calculations
     for (idx, sz) in enumerate(sizes):
         sz = (sz // L) * L
-        print(f'iter #{sd}, size = {sz}')
         y_clean, s, locs = generate_clean_micrograph_2d_rots(c, kvals, Bk, W, L, sz, gamma*(sz/L)**2, T, seed=sd)
         y = y_clean + np.random.default_rng().normal(loc=0, scale=np.sqrt(sigma2), size=np.shape(y_clean))
         del y_clean
@@ -138,6 +138,7 @@ def calc_err_size_both(L, ne, sizes, SNR, gamma, K, sd):
         np.save(f'errs_ac_sd{sd}_idx{idx}.npy', errs_ac)
         np.save(f'costs_ac_sd{sd}_idx{idx}.npy', costs_ac)
         np.save(f'times_ac_sd{sd}_idx{idx}.npy', times_ac)
+        print(f'finished iter #{sd}, size = {sz}. Error for EM = {errs_EM[idx, 0]}; error for autocorrelation analysis = {errs_ac[idx, 0]}.')
     np.save(f'errs_EM_sd{sd}.npy', errs_EM)
     np.save(f'costs_EM_sd{sd}.npy', costs_EM)
     np.save(f'times_EM_sd{sd}.npy', times_EM)
