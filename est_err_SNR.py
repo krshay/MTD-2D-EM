@@ -17,16 +17,16 @@ if __name__ == '__main__':
     Niters = 40
     L = 5
     ne = 10
-    NSNRs = 10
-    SNRs = np.logspace(-3, 2, NSNRs).astype(int)
+    NSNRs = 8
+    SNRs = np.logspace(-1, np.log10(500), NSNRs)
     
     N = 1000
     gamma = 0.04
-    K = 16
+    K = 32
     num_cpus = mp.cpu_count()
     # %% EM and Autocorrelation Analysis
     pool = mp.Pool(num_cpus)
-    S = pool.starmap(calc_err_SNR_both, [[L, ne, SNRs, N, gamma, K, i] for i in range(NSNRs)])
+    S = pool.starmap(calc_err_SNR_both, [[L, ne, SNRs, N, gamma, K, i] for i in range(Niters)])
     pool.close()
     pool.join() 
     
@@ -53,7 +53,7 @@ if __name__ == '__main__':
     with plt.style.context('ieee'):
         fig = plt.figure()
         
-        plt.loglog(SNRs, errs_EM_mean, '.-b', label=r'EM')
+        plt.loglog(SNRs, errs_EM_mean, '.-b', label=r'Approximate EM')
     
         plt.loglog(SNRs, errs_ac_mean, '.--r', label='Autocorrelation analysis')
         
@@ -67,7 +67,7 @@ if __name__ == '__main__':
         
         fig = plt.figure()
 
-        plt.semilogx(SNRs, errs_EM_mean, '.-b', label=r'EM')
+        plt.semilogx(SNRs, errs_EM_mean, '.-b', label=r'Approximate EM')
 
         plt.semilogx(SNRs, errs_ac_mean, '.--r', label='Autocorrelation analysis')
         
