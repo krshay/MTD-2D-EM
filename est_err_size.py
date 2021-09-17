@@ -20,7 +20,7 @@ if __name__ == '__main__':
     Nsizes = 8
     sizes = np.logspace(np.log10(500), np.log10(3000), Nsizes).astype(int)
     
-    SNR = 0.1
+    SNR = 50
     gamma = 0.04
     K = 16
     num_cpus = mp.cpu_count()
@@ -63,7 +63,7 @@ if __name__ == '__main__':
         fig = plt.figure()
         
         plt.loglog(sizes**2, errs_EM_mean[3]*(sizes**2/sizes[3]**2)**(-1/2), 'k--', label='_nolegend_', lw=0.5)
-        plt.loglog(sizes**2, errs_EM_mean, '.-b', label=r'EM')
+        plt.loglog(sizes**2, errs_EM_mean, '.-b', label=r'Approximate EM')
     
         plt.loglog(sizes**2, errs_ac_mean[3]*(sizes**2/sizes[3]**2)**(-1/2), 'k--', label='_nolegend_', lw=0.5)
         plt.loglog(sizes**2, errs_ac_mean, '.--r', label='Autocorrelation analysis')
@@ -76,16 +76,16 @@ if __name__ == '__main__':
         fig.tight_layout()
         plt.show()
         
-    #     fig = plt.figure()
+        fig = plt.figure()
 
-    #     plt.semilogx(sizes**2, errs_EM_mean, '.-b', label=r'EM')
+        plt.semilogx(sizes**2, errs_EM_mean, '.-b', label=r'Approximate EM')
 
-    #     plt.semilogx(sizes**2, errs_ac_mean, '.--r', label='Autocorrelation analysis')
+        plt.semilogx(sizes**2, errs_ac_mean, '.--r', label='Autocorrelation analysis')
         
-    #     plt.legend(loc=(0.5, 0.62))#, fontsize=6)
+        plt.legend(loc=(0.5, 0.62))#, fontsize=6)
         
-    #     plt.xlabel('Measurement size [pixels]')
+        plt.xlabel('Measurement size [pixels]')
         
-    #     plt.ylabel('Mean computation time [CPU sec]')
-    #     fig.tight_layout()
-    #     plt.show()
+        plt.ylabel('Mean computation time [CPU sec]')
+        fig.tight_layout()
+        plt.show()
