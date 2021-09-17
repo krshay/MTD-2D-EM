@@ -21,7 +21,7 @@ W = 2*L - 1 # L for arbitrary spacing distribution, 2*L-1 for well-separated
 K = 16 # discretization of rotations
 
 gamma = 0.04
-N = 3000
+N = 1000
 N = (N // L) * L
 ne = 10
 B, z, roots, kvals, nu = expand_fb(F, ne)
@@ -37,9 +37,9 @@ M_clean, s, locs = generate_clean_micrograph_2d_rots(c, kvals, Bk, W, L, N, gamm
 
 gamma = s[0]*(L/N)**2
 
-SNR = 0.5
+SNR = 500
 
-sigma2 = 1 / (L**2 *SNR)
+sigma2 = np.linalg.norm(F)**2 / (L**2 *SNR)
 
 M = M_clean + np.random.normal(loc=0, scale=np.sqrt(sigma2), size=np.shape(M_clean))
 
@@ -75,4 +75,3 @@ z_est, rho_est, log_likelihood = EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals
 
 err = min_err_coeffs(z, z_est, kvals)
 print(err[0])
-
