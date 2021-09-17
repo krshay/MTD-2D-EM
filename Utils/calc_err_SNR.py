@@ -79,7 +79,6 @@ def calc_err_SNR_both(L, ne, SNRs, N, gamma, K, sd):
     # %% calculations
     for (idx, SNR) in enumerate(SNRs):
         sigma2 = np.linalg.norm(X)**2 / (L**2 *SNR)
-        print(f'iter #{sd}, SNR = {SNR}')
 
         y = y_clean + np.random.default_rng().normal(loc=0, scale=np.sqrt(sigma2), size=np.shape(y_clean))
         
@@ -132,17 +131,19 @@ def calc_err_SNR_both(L, ne, SNRs, N, gamma, K, sd):
             errs_EM[idx, jj] = est_err_coeffs_EM[0]
             costs_EM[idx, jj] = log_likelihood_EM
             times_EM[idx, jj] = time_split + stopEM
-        np.save(f'errs_EM_sd{sd}_idx{idx}.npy', errs_EM)
-        np.save(f'costs_EM_sd{sd}_idx{idx}.npy', costs_EM)
-        np.save(f'times_EM_sd{sd}_idx{idx}.npy', times_EM)
-        np.save(f'errs_ac_sd{sd}_idx{idx}.npy', errs_ac)
-        np.save(f'costs_ac_sd{sd}_idx{idx}.npy', costs_ac)
-        np.save(f'times_ac_sd{sd}_idx{idx}.npy', times_ac)
-    np.save(f'errs_EM_sd{sd}.npy', errs_EM)
-    np.save(f'costs_EM_sd{sd}.npy', costs_EM)
-    np.save(f'times_EM_sd{sd}.npy', times_EM)
-    np.save(f'errs_ac_sd{sd}.npy', errs_ac)
-    np.save(f'costs_ac_sd{sd}.npy', costs_ac)
-    np.save(f'times_ac_sd{sd}.npy', times_ac)
+        np.save(f'DATA/errs_EM_sd{sd}_idx{idx}.npy', errs_EM)
+        np.save(f'DATA/costs_EM_sd{sd}_idx{idx}.npy', costs_EM)
+        np.save(f'DATA/times_EM_sd{sd}_idx{idx}.npy', times_EM)
+        np.save(f'DATA/errs_ac_sd{sd}_idx{idx}.npy', errs_ac)
+        np.save(f'DATA/costs_ac_sd{sd}_idx{idx}.npy', costs_ac)
+        np.save(f'DATA/times_ac_sd{sd}_idx{idx}.npy', times_ac)
+        print(f'finished iter #{sd}, SNR = {SNR}. Error for EM = {errs_EM[idx, 0]}; error for autocorrelation analysis = {errs_ac[idx, 0]}.')
+
+    np.save(f'DATA/errs_EM_sd{sd}.npy', errs_EM)
+    np.save(f'DATA/costs_EM_sd{sd}.npy', costs_EM)
+    np.save(f'DATA/times_EM_sd{sd}.npy', times_EM)
+    np.save(f'DATA/errs_ac_sd{sd}.npy', errs_ac)
+    np.save(f'DATA/costs_ac_sd{sd}.npy', costs_ac)
+    np.save(f'DATA/times_ac_sd{sd}.npy', times_ac)
     print(f'iter #{sd} finished')
     return errs_EM, costs_EM, times_EM, errs_ac, costs_ac, times_ac
