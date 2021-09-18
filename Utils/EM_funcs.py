@@ -41,6 +41,8 @@ def EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2):
         z_k = z_updated
         rho_k = rho_updated
         if (not np.isinf(log_likelihood) and count != 1 and log_likelihood - log_likelihood_prev < 1) or count > 12:
+            if count > 10:
+                print('finished after 10 iterations')
             break
         print(log_likelihood)
         log_likelihood_prev = log_likelihood
