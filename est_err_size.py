@@ -17,12 +17,12 @@ if __name__ == '__main__':
     Niters = 40
     L = 5
     ne = 10
-    Nsizes = 8
-    sizes = np.logspace(np.log10(500), np.log10(3000), Nsizes).astype(int)
+    Nsizes = 10
+    sizes = np.logspace(np.log10(300), np.log10(3000), Nsizes).astype(int)
     
     SNR = 50
     gamma = 0.04
-    K = 16
+    K = 32
     num_cpus = mp.cpu_count()
     # %% EM and Autocorrelation Analysis
     pool = mp.Pool(num_cpus)
@@ -47,16 +47,7 @@ if __name__ == '__main__':
         times_ac[j, :] = S[j][5][np.arange(Nsizes), np.argmin(S[j][4], axis=1)]
     errs_ac_mean = np.mean(errs_ac, 0)
     times_ac_mean = np.mean(times_ac, 0)
-    # errs_EM = np.zeros((Niters, Nsizes, 1))
-    # costs_EM = np.zeros((Niters, Nsizes, 1))
-    # times_EM = np.zeros((Niters, Nsizes, 1))
-    # errs_ac = np.zeros((Niters, Nsizes, 1))
-    # costs_ac = np.zeros((Niters, Nsizes, 1))
-    # times_ac = np.zeros((Niters, Nsizes, 1))
-    
-    # for i in range((Niters)):
-    #     errs_EM[i, :, :], costs_EM[i, :, :], times_EM[i, :, :], errs_ac[i, :, :], costs_ac[i, :, :], times_ac[i, :, :] = calc_err_size_both(L, ne, sizes, SNR, gamma, K, i)
-    
+
     # %% plots
     plt.close("all")
     with plt.style.context('ieee'):

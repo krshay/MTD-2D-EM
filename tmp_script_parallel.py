@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Jun 25 11:18:47 2021
+Created on Fri Sep 17 21:23:42 2021
 
 @author: Shay Kreymer
 """
@@ -9,11 +9,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from Utils.fb_funcs import expand_fb, calcT
 from Utils.generate_clean_micrograph_2d import generate_clean_micrograph_2d_rots
-from Utils.EM_funcs import EM_parallel, EM, rearangeB, PsiPsi, calcB_CTZs
+from Utils.EM_funcs import EM_parallel
 from Utils.fb_funcs import min_err_coeffs
-
-import time
-
 plt.close("all")
 
 if __name__ == '__main__':
@@ -22,10 +19,10 @@ if __name__ == '__main__':
     L = np.shape(F)[0]
     F = 10 * F / np.linalg.norm(F)
     W = 2*L - 1 # L for arbitrary spacing distribution, 2*L-1 for well-separated
-    K = 16 # discretization of rotations
+    K = 4 # discretization of rotations
     
     gamma = 0.04
-    N = 500
+    N = 1000
     N = (N // L) * L
     ne = 10
     B, z, roots, kvals, nu = expand_fb(F, ne)
@@ -75,16 +72,9 @@ if __name__ == '__main__':
     F_init = 10 * F_init / np.linalg.norm(F_init)
     _, z_init, _, _, _ = expand_fb(F_init, ne)
     
-    Bs = rearangeB(B)
-    PsiPsi_vals = PsiPsi(Bs, L, K, nu, kvals)
-    BCTZs = calcB_CTZs(B, K, L, kvals)
-    start = time.time()
-    z_est_parallel, rho_est, log_likelihood, numiters = EM_parallel(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2, BCTZs, PsiPsi_vals)
-    print(time.time() - start)
+    z_est, rho_est, log_likelihood = EM_parallel(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2)
     
-    start = time.time()
-    z_est, rho_est, log_likelihood = EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2)
-    print(time.time() - start)
-    
-    # err = min_err_coeffs(z, z_est, kvals)
-    # print(err[0])
+    err = min_err_coeffs(z, z_est, kvals)
+    print(err[0])
+
+
