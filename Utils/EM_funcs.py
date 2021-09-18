@@ -33,10 +33,9 @@ def EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2):
         pM_k = pM_k / np.sum(pM_k, axis=(0, 1, 2))
         likelihood_func_l_phi = np.einsum("Pijm,ij->Pijm", pM_k, rho_k)
         pl_phi_k = likelihood_func_l_phi / np.sum(likelihood_func_l_phi, axis=(0, 1, 2))
-        log_likelihood = np.sum(np.log(np.sum(np.einsum("kijm,ij->kijm", pM_k_likelihood, rho_k), axis=(0, 1, 2))))
-        st = time.time()
+        with np.errstate(divide='ignore'):
+            log_likelihood = np.sum(np.log(np.sum(np.einsum("kijm,ij->kijm", pM_k_likelihood, rho_k), axis=(0, 1, 2))))
         z_updated = z_step(pl_phi_k, Ms, B, L, K, nu, kvals, sigma2, PsiPsi_vals)
-        print(time.time() - st)
         rho_updated = rho_step(pl_phi_k, Nd)
         z_k = z_updated
         rho_k = rho_updated
