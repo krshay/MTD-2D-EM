@@ -18,11 +18,11 @@ if __name__ == '__main__':
     L = 5
     ne = 10
     Nsizes = 10
-    sizes = np.logspace(np.log10(300), np.log10(3000), Nsizes).astype(int)
+    sizes = np.logspace(np.log10(200), np.log10(2000), Nsizes).astype(int)
     
     SNR = 50
     gamma = 0.04
-    K = 32
+    K = 16
     num_cpus = mp.cpu_count()
     # %% EM and Autocorrelation Analysis
     pool = mp.Pool(num_cpus)
@@ -69,9 +69,9 @@ if __name__ == '__main__':
         
         fig = plt.figure()
 
-        plt.semilogx(sizes**2, errs_EM_mean, '.-b', label=r'Approximate EM')
+        plt.semilogx(sizes**2, times_EM_mean, '.-b', label=r'Approximate EM')
 
-        plt.semilogx(sizes**2, errs_ac_mean, '.--r', label='Autocorrelation analysis')
+        plt.semilogx(sizes**2, times_ac_mean, '.--r', label='Autocorrelation analysis')
         
         plt.legend(loc=(0.5, 0.62))#, fontsize=6)
         
