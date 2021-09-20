@@ -17,12 +17,12 @@ if __name__ == '__main__':
     Niters = 40
     L = 5
     ne = 10
-    NSNRs = 8
-    SNRs = np.logspace(-1, np.log10(500), NSNRs)
+    NSNRs = 18
+    SNRs = np.logspace(-2, 2, NSNRs)
     
-    N = 1000
+    N = 1500
     gamma = 0.04
-    K = 32
+    K = 16
     num_cpus = mp.cpu_count()
     # %% EM and Autocorrelation Analysis
     pool = mp.Pool(num_cpus)
@@ -64,7 +64,7 @@ if __name__ == '__main__':
         plt.ylabel('Mean estimation error')
         fig.tight_layout()
         plt.show()
-        plt.savefig(r'C:\Users\kreym\Google Drive\PhD\Documents\MTD-2D-EM-ICASSP\figures/experiment_SNR_err.pdf')
+        # plt.savefig(r'C:\Users\kreym\Google Drive\PhD\Documents\MTD-2D-EM-ICASSP\figures/experiment_SNR_err.pdf')
 
         fig = plt.figure()
 
@@ -79,4 +79,4 @@ if __name__ == '__main__':
         plt.ylabel('Mean computation time [CPU sec]')
         fig.tight_layout()
         plt.show()
-        plt.savefig(r'C:\Users\kreym\Google Drive\PhD\Documents\MTD-2D-EM-ICASSP\figures/experiment_SNR_time.pdf')
+        # plt.savefig(r'C:\Users\kreym\Google Drive\PhD\Documents\MTD-2D-EM-ICASSP\figures/experiment_SNR_time.pdf')
