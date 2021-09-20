@@ -49,15 +49,15 @@ if __name__ == '__main__':
         times_ac[j, :] = S[j][5][np.arange(NSNRs), np.argmin(S[j][4], axis=1)]
     errs_ac_mean = np.mean(errs_ac, 0)
     times_ac_mean = np.mean(times_ac, 0)
-
+    sigmas = np.sqrt(100 / (25 * SNRs))
     # %% plots
     plt.close("all")
     with plt.style.context('ieee'):
         fig = plt.figure()
-        # plt.loglog(SNRs, errs_EM_mean[-1]*(SNRs/SNRs[-1])**(-1/2), 'k--', label='_nolegend_', lw=0.5)
-        plt.loglog(SNRs, errs_EM_mean, '.-b', label=r'Approximate EM')
+        plt.loglog(sigmas, errs_EM_mean[-5]*(sigmas/sigmas[-5])**(3), 'k--', label='_nolegend_', lw=0.5)
+        plt.loglog(sigmas, errs_EM_mean, '.-b', label=r'Approximate EM')
     
-        plt.loglog(SNRs, errs_ac_mean, '.--r', label='Autocorrelation analysis')
+        plt.loglog(sigmas, errs_ac_mean, '.--r', label='Autocorrelation analysis')
         
         plt.legend(loc=1)#, fontsize=6)
         

@@ -25,7 +25,7 @@ if __name__ == '__main__':
     K = 16 # discretization of rotations
     
     gamma = 0.04
-    N = 500
+    N = 1500
     N = (N // L) * L
     ne = 10
     B, z, roots, kvals, nu = expand_fb(F, ne)
@@ -41,9 +41,11 @@ if __name__ == '__main__':
     
     gamma = s[0]*(L/N)**2
     
-    SNR = 500
+    sigma = 0.2
     
-    sigma2 = np.linalg.norm(F)**2 / (L**2 *SNR)
+    sigma2 = sigma**2
+    
+    # sigma2 = np.linalg.norm(F)**2 / (L**2 *SNR)
     
     M = M_clean + np.random.normal(loc=0, scale=np.sqrt(sigma2), size=np.shape(M_clean))
     
@@ -75,12 +77,12 @@ if __name__ == '__main__':
     F_init = 10 * F_init / np.linalg.norm(F_init)
     _, z_init, _, _, _ = expand_fb(F_init, ne)
     
-    Bs = rearangeB(B)
-    PsiPsi_vals = PsiPsi(Bs, L, K, nu, kvals)
-    BCTZs = calcB_CTZs(B, K, L, kvals)
-    start = time.time()
-    z_est_parallel, rho_est, log_likelihood, numiters = EM_parallel(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2, BCTZs, PsiPsi_vals)
-    print(time.time() - start)
+    # Bs = rearangeB(B)
+    # PsiPsi_vals = PsiPsi(Bs, L, K, nu, kvals)
+    # BCTZs = calcB_CTZs(B, K, L, kvals)
+    # start = time.time()
+    # z_est_parallel, rho_est, log_likelihood, numiters = EM_parallel(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2, BCTZs, PsiPsi_vals)
+    # print(time.time() - start)
     
     start = time.time()
     z_est, rho_est, log_likelihood = EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2)
