@@ -18,8 +18,8 @@ if __name__ == '__main__':
     L = 5
     ne = 10
     
-    SNR = 1
-    N = 2000
+    SNR = 5
+    N = 1500
     gamma = 0.04
     Ks = [1, 2, 4, 8, 16, 32]
     NKs = np.shape(Ks)[0]
@@ -53,30 +53,32 @@ if __name__ == '__main__':
     with plt.style.context('ieee'):
         fig = plt.figure()
         # plt.loglog(Ks, errs_EM_mean[-1]*(Ks/Ks[-1])**(-1/2), 'k--', label='_nolegend_', lw=0.5)
-        plt.loglog(Ks, errs_EM_mean, '.-b', label=r'Approximate EM')
+        plt.semilogy(Ks, errs_EM_mean, '.-b', label=r'Approximate EM')
     
-        plt.loglog(Ks, errs_ac_mean, '.--r', label='Autocorrelation analysis')
+        plt.semilogy(Ks, errs_ac_mean, '.--r', label='Autocorrelation analysis')
         
-        plt.legend(loc=1)#, fontsize=6)
+        plt.legend(loc=1, fontsize=6)
         
         plt.xlabel('K')
         
         plt.ylabel('Mean estimation error')
+        plt.xticks(Ks)
         fig.tight_layout()
         plt.show()
-        plt.savefig(r'C:\Users\kreym\Google Drive\PhD\Documents\MTD-2D-EM-ICASSP\figures/experiment_SNR_err.pdf')
+        plt.savefig(r'C:\Users\kreym\Google Drive\PhD\Documents\MTD-2D-EM-ICASSP\figures/experiment_K_err.pdf')
 
         fig = plt.figure()
 
-        plt.loglog(Ks, times_EM_mean, '.-b', label=r'Approximate EM')
+        plt.plot(Ks, times_EM_mean, '.-b', label=r'Approximate EM')
 
-        plt.loglog(Ks, times_ac_mean, '.--r', label='Autocorrelation analysis')
+        plt.plot(Ks, times_ac_mean, '.--r', label='Autocorrelation analysis')
         
-        plt.legend(loc=(0.3, 0.3))#, fontsize=6)
+        plt.legend(loc=2, fontsize=6)
         
         plt.xlabel('K')
+        plt.xticks(Ks)
         
         plt.ylabel('Mean computation time [CPU sec]')
         fig.tight_layout()
         plt.show()
-        plt.savefig(r'C:\Users\kreym\Google Drive\PhD\Documents\MTD-2D-EM-ICASSP\figures/experiment_SNR_time.pdf')
+        plt.savefig(r'C:\Users\kreym\Google Drive\PhD\Documents\MTD-2D-EM-ICASSP\figures/experiment_K_time.pdf')
