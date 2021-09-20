@@ -25,7 +25,7 @@ if __name__ == '__main__':
     K = 16 # discretization of rotations
     
     gamma = 0.04
-    N = 1000
+    N = 200
     N = (N // L) * L
     ne = 10
     B, z, roots, kvals, nu = expand_fb(F, ne)

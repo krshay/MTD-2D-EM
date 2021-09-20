@@ -129,7 +129,8 @@ def EM_parallel(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2, BCTZs,
     count = 1
     while True:
         st = time.time()
-        S = np.reshape(pool.starmap(calc_pMm_l_phi_z, [[Ms, Phi_Ls_split[i], z_k, kvals, Bk, L] for i in range(num_cpus)]), (K, 2*L, 2*L, Nd))
+        Ss = pool.starmap(calc_pMm_l_phi_z, [[Ms, Phi_Ls_split[i], z_k, kvals, Bk, L] for i in range(num_cpus)])
+        S = np.reshape(Ss, (K, 2*L, 2*L, Nd))
         print(f'computing S took {time.time() - st} secs')
         
         S_normalized = S - np.min(S, axis=(0, 1, 2))
