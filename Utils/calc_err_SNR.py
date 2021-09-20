@@ -78,7 +78,7 @@ def calc_err_SNR_both(L, ne, SNRs, N, gamma, K, sd):
     y_clean, s, locs = generate_clean_micrograph_2d_rots(c, kvals, Bk, W, L, N, gamma*(N/L)**2, T, seed=sd)
     # %% calculations
     for (idx, SNR) in enumerate(SNRs):
-        sigma2 = np.linalg.norm(X)**2 / (L**2 *SNR)
+        sigma2 = np.linalg.norm(X)**2 / (L**2 * SNR)
 
         y = y_clean + np.random.default_rng().normal(loc=0, scale=np.sqrt(sigma2), size=np.shape(y_clean))
         

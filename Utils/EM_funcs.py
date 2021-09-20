@@ -24,9 +24,11 @@ def EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2):
     log_likelihood_prev = 0
     count = 1
     while True:
+        st = time.time()
         for (iPhi, phi) in enumerate(Phi):
             for l in Ls:
                 S[iPhi, l[0], l[1], :] = np.real(pMm_l_phi_z(Ms, l, phi, z_k, kvals, Bk, L))
+        print(f'computing S took {time.time() - st} secs')
         S_normalized = S - np.min(S, axis=(0, 1, 2))
         pM_k = np.exp(-S_normalized / (2 * sigma2))
         pM_k_likelihood = np.exp(-S / (2 * sigma2))
@@ -35,7 +37,9 @@ def EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2):
         pl_phi_k = likelihood_func_l_phi / np.sum(likelihood_func_l_phi, axis=(0, 1, 2))
         with np.errstate(divide='ignore'):
             log_likelihood = np.sum(np.log(np.sum(np.einsum("kijm,ij->kijm", pM_k_likelihood, rho_k), axis=(0, 1, 2))))
+        st = time.time()
         z_updated = z_step(pl_phi_k, Ms, B, L, K, nu, kvals, sigma2, PsiPsi_vals)
+        print(f'computing updated z took {time.time() - st} secs')
         rho_updated = rho_step(pl_phi_k, Nd)
         z_k = z_updated
         rho_k = rho_updated
@@ -46,6 +50,7 @@ def EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2):
         print(log_likelihood)
         log_likelihood_prev = log_likelihood
         count += 1
+        break
     return z_k, rho_k, log_likelihood
         
 def z_step(pl_phi_k, Ms, B, L, K, nu, kvals, sigma2, PsiPsi_vals):
@@ -117,12 +122,16 @@ def EM_parallel(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2, BCTZs,
     Ls = calc_shifts(L)
     Phi_Ls = set_Phi_Ls(Phi, Ls)
     Phi_Ls_split = np.array_split(Phi_Ls, num_cpus)
+    Msplit = np.array_split(Ms, num_cpus, 2)
     pM_k = np.zeros((K, 2*L, 2*L, Nd))
     B = rearangeB(B)
     log_likelihood_prev = 0
     count = 1
     while True:
+        st = time.time()
         S = np.reshape(pool.starmap(calc_pMm_l_phi_z, [[Ms, Phi_Ls_split[i], z_k, kvals, Bk, L] for i in range(num_cpus)]), (K, 2*L, 2*L, Nd))
+        print(f'computing S took {time.time() - st} secs')
+        
         S_normalized = S - np.min(S, axis=(0, 1, 2))
         pM_k = np.exp(-S_normalized / (2 * sigma2))
         pM_k_likelihood = np.exp(-S / (2 * sigma2))
@@ -131,22 +140,24 @@ def EM_parallel(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2, BCTZs,
         pl_phi_k = likelihood_func_l_phi / np.sum(likelihood_func_l_phi, axis=(0, 1, 2))
         with np.errstate(divide='ignore'):
             log_likelihood = np.sum(np.log(np.sum(np.einsum("kijm,ij->kijm", pM_k_likelihood, rho_k), axis=(0, 1, 2))))
+        pl_phi_ks = np.array_split(pl_phi_k, num_cpus, 3)
         st = time.time()
-        z_updated = z_step_parallel(pl_phi_k, Ms, BCTZs, Phi_Ls_split, L, K, nu, kvals, sigma2, PsiPsi_vals, pool)
-        print(time.time() - st)
+        z_updated = z_step_parallel(pl_phi_ks, Msplit, BCTZs, Phi, Ls, L, K, nu, kvals, sigma2, PsiPsi_vals, pool)
+        print(f'computing updated z took {time.time() - st} secs')
         rho_updated = rho_step(pl_phi_k, Nd)
         z_k = z_updated
         rho_k = rho_updated
-        if not np.isinf(log_likelihood) and count != 1 and log_likelihood - log_likelihood_prev < 100 or count > 10:
+        if not np.isinf(log_likelihood) and count != 1 and log_likelihood - log_likelihood_prev < 100 or count > 19:
             break
         print(log_likelihood)
         log_likelihood_prev = log_likelihood
         count += 1
+        break
     return z_k, rho_k, log_likelihood, count
 
-def z_step_parallel(pl_phi_k, Ms, BCTZs, Phi_Ls_split, L, K, nu, kvals, sigma2, PsiPsi_vals, pool):
+def z_step_parallel(pl_phi_ks, Ms, BCTZs, Phi, Ls, L, K, nu, kvals, sigma2, PsiPsi_vals, pool):
     num_cpus = mp.cpu_count()
-    S = pool.starmap(partial_z_step, [[pl_phi_k, Ms, BCTZs, Phi_Ls_split[i], K, nu, kvals, sigma2, PsiPsi_vals] for i in range(num_cpus)])
+    S = pool.starmap(partial_z_step, [[pl_phi_ks[i], Ms[i], BCTZs, Phi, Ls, K, nu, kvals, sigma2, PsiPsi_vals] for i in range(num_cpus)])
     y = np.zeros((nu, ), dtype=np.complex_)
     A = np.zeros((nu, nu), dtype=np.complex_)
     for i in range(num_cpus):
@@ -154,16 +165,14 @@ def z_step_parallel(pl_phi_k, Ms, BCTZs, Phi_Ls_split, L, K, nu, kvals, sigma2, 
         A += S[i][1]
     return np.linalg.inv(A) @ y
 
-def partial_z_step(pl_phi_k, Ms, BCTZs, Phi_Ls_split, K, nu, kvals, sigma2, PsiPsi_vals):
+def partial_z_step(pl_phi_k, Ms, BCTZs, Phi, Ls, K, nu, kvals, sigma2, PsiPsi_vals):
     y = np.zeros((nu, ), dtype=np.complex_)
     A = np.zeros((nu, nu), dtype=np.complex_)
-    for idx in range(np.shape(Phi_Ls_split)[0]):
-        phi = Phi_Ls_split[idx][0]
-        iphi = int(K / (2 * np.pi / phi))
-        l = Phi_Ls_split[idx][1]
-        y += (1/sigma2) * np.einsum("k,ki->i", pl_phi_k[iphi, l[0], l[1], :], \
-            np.einsum("ijm,ijn->mn", Ms, BCTZs[iphi, l[0], l[1]]))
-        A += (1/sigma2) * np.sum(pl_phi_k[iphi, l[0], l[1], :]) * PsiPsi_vals[iphi, l[0], l[1], :, :]
+    for (iPhi, phi) in enumerate(Phi):
+            for l in Ls:
+                y += (1/sigma2) * np.einsum("k,ki->i", pl_phi_k[iPhi, l[0], l[1], :], \
+                    np.einsum("ijm,ijn->mn", Ms, BCTZs[iPhi, l[0], l[1], :, :, :]))
+                A += (1/sigma2) * np.sum(pl_phi_k[iPhi, l[0], l[1], :]) * PsiPsi_vals[iPhi, l[0], l[1], :, :]
     return y, A
 
 def set_Phi_Ls(Phi, Ls):
