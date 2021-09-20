@@ -55,6 +55,8 @@ def calc_err_size_both(L, ne, sizes, SNR, gamma, K, sd):
     for ii in range(nu):
         Bk[ :, :, ii] = np.fft.fft2(np.pad(np.reshape(B[ :, ii], (L, L)), L//2))
 
+    y_clean, s, locs = generate_clean_micrograph_2d_rots(c, kvals, Bk, W, L, np.max(sizes), gamma*(np.max(sizes)/L)**2, T, seed=sd)
+    y = y_clean + np.random.default_rng().normal(loc=0, scale=np.sqrt(sigma2), size=np.shape(y_clean))
     # %% initial guesses
     gamma_initial = 0.03
     
@@ -79,12 +81,10 @@ def calc_err_size_both(L, ne, sizes, SNR, gamma, K, sd):
     # %% calculations
     for (idx, sz) in enumerate(sizes):
         sz = (sz // L) * L
-        y_clean, s, locs = generate_clean_micrograph_2d_rots(c, kvals, Bk, W, L, sz, gamma*(sz/L)**2, T, seed=sd)
-        y = y_clean + np.random.default_rng().normal(loc=0, scale=np.sqrt(sigma2), size=np.shape(y_clean))
-        del y_clean
+        yi = y[:sz, :sz]
         
         yy = np.zeros((sz, sz, 1))
-        yy[ :, :, 0] = y
+        yy[ :, :, 0] = yi
         
         # %% Autocorrelation Analysis
         start_ac_calc = time.time()
@@ -117,13 +117,16 @@ def calc_err_size_both(L, ne, sizes, SNR, gamma, K, sd):
             
         # %% Expectation-maximization
         start_split = time.time()
+        
         Nd = int((sz / L) ** 2)
-        Mss = [np.array_split(Mm, np.sqrt(Nd), axis=1) for Mm in np.array_split(y, np.sqrt(Nd), axis=0)]
+        Mss = [np.array_split(Mm, np.sqrt(Nd), axis=1) for Mm in np.array_split(yi, np.sqrt(Nd), axis=0)]
         Mss = [item for sublist in Mss for item in sublist]
         Ms = np.zeros((L, L, Nd))
         for idxx, Mm in enumerate(Mss):
             Ms[ :, :, idxx] = Mm
+            
         time_split = time.time() - start_split
+        
         for jj in range(NumGuesses):
             startEM = time.time()
             z_est_EM, rho_est_EM, log_likelihood_EM = EM(Ms, zs[jj, :], rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2)

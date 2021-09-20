@@ -31,10 +31,12 @@ if __name__ == '__main__':
     pool.join() 
     
     errs_EM = np.zeros((Niters, NSNRs))
+    likelihood_EM = np.zeros((Niters, NSNRs))
     times_EM = np.zeros((Niters, NSNRs))
 
     for j in range(Niters):
         errs_EM[j, :] = S[j][0][np.arange(NSNRs), np.argmin(S[j][1], axis=1)]
+        likelihood_EM[j, :] = S[j][1][np.arange(NSNRs), np.argmin(S[j][1], axis=1)]
         times_EM[j, :] = S[j][2][np.arange(NSNRs), np.argmin(S[j][1], axis=1)]
     errs_EM_mean = np.mean(errs_EM, 0)
     times_EM_mean = np.mean(times_EM, 0)
