@@ -55,9 +55,9 @@ if __name__ == '__main__':
         # plt.loglog(Ks, errs_EM_mean[-1]*(Ks/Ks[-1])**(-1/2), 'k--', label='_nolegend_', lw=0.5)
         plt.semilogy(Ks, errs_EM_mean, '.-b', label=r'Approximate EM')
     
-        plt.semilogy(Ks, errs_ac_mean, '.--r', label='Autocorrelation analysis')
+        plt.semilogy(Ks, errs_ac_mean, '--r', label='Autocorrelation analysis')
         
-        plt.legend(loc=1, fontsize=6)
+        plt.legend(loc=1)#, fontsize=6)
         
         plt.xlabel('K')
         
@@ -71,9 +71,9 @@ if __name__ == '__main__':
 
         plt.plot(Ks, times_EM_mean, '.-b', label=r'Approximate EM')
 
-        plt.plot(Ks, times_ac_mean, '.--r', label='Autocorrelation analysis')
+        plt.plot(Ks, times_ac_mean, '--r', label='Autocorrelation analysis')
         
-        plt.legend(loc=2, fontsize=6)
+        plt.legend(loc=2)#, fontsize=6)
         
         plt.xlabel('K')
         plt.xticks(Ks)
