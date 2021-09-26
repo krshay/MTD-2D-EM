@@ -10,9 +10,11 @@ import itertools
 from Utils.fb_funcs import rot_img_freq
 import multiprocessing as mp
 
+from Utils.fb_funcs import min_err_coeffs
+
 import time
 
-def EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2):
+def EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2, z_real):
     z_k = z_init
     rho_k = rho_init
     Phi = calc_Phi(K)
@@ -24,11 +26,9 @@ def EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2):
     log_likelihood_prev = 0
     count = 1
     while True:
-        st = time.time()
         for (iPhi, phi) in enumerate(Phi):
             for l in Ls:
                 S[iPhi, l[0], l[1], :] = np.real(pMm_l_phi_z(Ms, l, phi, z_k, kvals, Bk, L))
-        print(f'computing S took {time.time() - st} secs')
         S_normalized = S - np.min(S, axis=(0, 1, 2))
         pM_k = np.exp(-S_normalized / (2 * sigma2))
         pM_k_likelihood = np.exp(-S / (2 * sigma2))
@@ -37,20 +37,19 @@ def EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2):
         pl_phi_k = likelihood_func_l_phi / np.sum(likelihood_func_l_phi, axis=(0, 1, 2))
         with np.errstate(divide='ignore'):
             log_likelihood = np.sum(np.log(np.sum(np.einsum("kijm,ij->kijm", pM_k_likelihood, rho_k), axis=(0, 1, 2))))
-        st = time.time()
         z_updated = z_step(pl_phi_k, Ms, B, L, K, nu, kvals, sigma2, PsiPsi_vals)
-        print(f'computing updated z took {time.time() - st} secs')
         rho_updated = rho_step(pl_phi_k, Nd)
         z_k = z_updated
         rho_k = rho_updated
-        if (not np.isinf(log_likelihood) and count != 1 and log_likelihood - log_likelihood_prev < 1) or count > 19:
-            if count > 10:
-                print('finished after 10 iterations')
+        if count > 30: # (not np.isinf(log_likelihood) and count != 1 and log_likelihood - log_likelihood_prev < 1) or 
+            # if count > 10:
+            #     print('finished after 10 iterations')
             break
         print(log_likelihood)
+        err = min_err_coeffs(z_real, z_k, kvals)
+        print(f'the error is {err[0]}')
         log_likelihood_prev = log_likelihood
         count += 1
-        break
     return z_k, rho_k, log_likelihood
         
 def z_step(pl_phi_k, Ms, B, L, K, nu, kvals, sigma2, PsiPsi_vals):
@@ -153,7 +152,6 @@ def EM_parallel(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2, BCTZs,
         print(log_likelihood)
         log_likelihood_prev = log_likelihood
         count += 1
-        break
     return z_k, rho_k, log_likelihood, count
 
 def z_step_parallel(pl_phi_ks, Ms, BCTZs, Phi, Ls, L, K, nu, kvals, sigma2, PsiPsi_vals, pool):

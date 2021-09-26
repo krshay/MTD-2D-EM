@@ -20,12 +20,12 @@ if __name__ == '__main__':
     np.random.seed(1)
     F = np.random.rand(5, 5)
     L = np.shape(F)[0]
-    F = 10 * F / np.linalg.norm(F)
+    F = F / np.linalg.norm(F)
     W = 2*L - 1 # L for arbitrary spacing distribution, 2*L-1 for well-separated
     K = 16 # discretization of rotations
     
     gamma = 0.04
-    N = 200
+    N = 500
     N = (N // L) * L
     ne = 10
     B, z, roots, kvals, nu = expand_fb(F, ne)
@@ -41,11 +41,9 @@ if __name__ == '__main__':
     
     gamma = s[0]*(L/N)**2
     
-    sigma = 0.2
+    SNR = 1
     
-    sigma2 = sigma**2
-    
-    # sigma2 = np.linalg.norm(F)**2 / (L**2 *SNR)
+    sigma2 = np.linalg.norm(F)**2 / (L**2 * SNR)
     
     M = M_clean + np.random.normal(loc=0, scale=np.sqrt(sigma2), size=np.shape(M_clean))
     
@@ -65,7 +63,7 @@ if __name__ == '__main__':
     M_empty = np.sum(Ms_clean, axis=(0,1))
     beta = np.sum(M_empty == 0) / Nd
     
-    beta0 = 0.90
+    beta0 = 0.8865
     rho_init = np.zeros((2*L, 2*L))
     for i in range(2*L):
         for j in range(2*L):
@@ -74,19 +72,20 @@ if __name__ == '__main__':
                 rho_init[i, j] = beta0 / (4*L - 1)
     
     F_init = np.random.rand(5, 5)
-    F_init = 10 * F_init / np.linalg.norm(F_init)
+    F_init = F_init / np.linalg.norm(F_init)
+    # F_init = F + 0.1* np.random.rand(L, L)
     _, z_init, _, _, _ = expand_fb(F_init, ne)
     
-    Bs = rearangeB(B)
-    PsiPsi_vals = PsiPsi(Bs, L, K, nu, kvals)
-    BCTZs = calcB_CTZs(B, K, L, kvals)
-    start = time.time()
-    z_est_parallel, rho_est, log_likelihood, numiters = EM_parallel(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2, BCTZs, PsiPsi_vals)
-    print(time.time() - start)
+    # Bs = rearangeB(B)
+    # PsiPsi_vals = PsiPsi(Bs, L, K, nu, kvals)
+    # BCTZs = calcB_CTZs(B, K, L, kvals)
+    # start = time.time()
+    # z_est_parallel, rho_est, log_likelihood, numiters = EM_parallel(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2, BCTZs, PsiPsi_vals)
+    # print(time.time() - start)
     
     start = time.time()
-    z_est, rho_est, log_likelihood = EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2)
+    z_est, rho_est, log_likelihood = EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2, z)
     print(time.time() - start)
     
-    # err = min_err_coeffs(z, z_est, kvals)
-    # print(err[0])
+    err = min_err_coeffs(z, z_est, kvals)
+    print(err[0])

@@ -49,12 +49,11 @@ if __name__ == '__main__':
         times_ac[j, :] = S[j][5][np.arange(NSNRs), np.argmin(S[j][4], axis=1)]
     errs_ac_mean = np.mean(errs_ac, 0)
     times_ac_mean = np.mean(times_ac, 0)
-    sigmas = np.sqrt(100 / (25 * SNRs))
     # %% plots
     plt.close("all")
     with plt.style.context('ieee'):
         fig = plt.figure()
-        # plt.loglog(sigmas, errs_EM_mean[-5]*(sigmas/sigmas[-5])**(3), 'k--', label='_nolegend_', lw=0.5)
+        plt.loglog(SNRs[9:15], errs_EM_mean[9]*(SNRs[9:15]/SNRs[9])**(-3/2), 'k--', label='_nolegend_', lw=0.5)
         plt.loglog(SNRs, errs_EM_mean, '.-b', label=r'Approximate EM')
         # plt.loglog(SNRs, errs_ac_mean[4]*(SNRs/SNRs[4])**(-3/2), 'k--', label='_nolegend_', lw=0.5)
 
@@ -69,17 +68,17 @@ if __name__ == '__main__':
         plt.show()
         plt.savefig(r'C:\Users\kreym\Google Drive\PhD\Documents\MTD-2D-EM-ICASSP\figures/experiment_SNR_err.pdf')
 
-        fig = plt.figure()
+        # fig = plt.figure()
 
-        plt.loglog(SNRs, times_EM_mean, '.-b', label=r'Approximate EM')
+        # plt.loglog(SNRs, times_EM_mean, '.-b', label=r'Approximate EM')
 
-        plt.loglog(SNRs, times_ac_mean, '.--r', label='Autocorrelation analysis')
+        # plt.loglog(SNRs, times_ac_mean, '.--r', label='Autocorrelation analysis')
         
-        plt.legend(loc=(0.3, 0.3))#, fontsize=6)
+        # plt.legend(loc=(0.3, 0.3))#, fontsize=6)
         
-        plt.xlabel('SNR')
+        # plt.xlabel('SNR')
         
-        plt.ylabel('Mean computation time [CPU sec]')
-        fig.tight_layout()
-        plt.show()
-        plt.savefig(r'C:\Users\kreym\Google Drive\PhD\Documents\MTD-2D-EM-ICASSP\figures/experiment_SNR_time.pdf')
+        # plt.ylabel('Mean computation time [CPU sec]')
+        # fig.tight_layout()
+        # plt.show()
+        # plt.savefig(r'C:\Users\kreym\Google Drive\PhD\Documents\MTD-2D-EM-ICASSP\figures/experiment_SNR_time.pdf')

@@ -18,9 +18,9 @@ if __name__ == '__main__':
     L = 5
     ne = 10
     Nsizes = 10
-    sizes = np.logspace(np.log10(200), np.log10(2000), Nsizes).astype(int)
+    sizes = np.logspace(np.log10(150), np.log10(1500), Nsizes).astype(int)
     
-    SNR = 50
+    SNR = 5
     gamma = 0.04
     K = 16
     num_cpus = mp.cpu_count()
@@ -35,11 +35,11 @@ if __name__ == '__main__':
     times_EM = np.zeros((Niters, Nsizes))
 
     for j in range(Niters):
-        errs_EM[j, :] = S[j][0][np.arange(Nsizes), np.argmin(S[j][1], axis=1)]
-        likelihood_EM[j, :] = S[j][1][np.arange(Nsizes), np.argmin(S[j][1], axis=1)]
-        times_EM[j, :] = S[j][2][np.arange(Nsizes), np.argmin(S[j][1], axis=1)]
-    errs_EM_mean = np.median(errs_EM, 0)
-    times_EM_mean = np.median(times_EM, 0)
+        errs_EM[j, :] = S[j][0][np.arange(Nsizes), np.argmax(S[j][1], axis=1)]
+        likelihood_EM[j, :] = S[j][1][np.arange(Nsizes), np.argmax(S[j][1], axis=1)]
+        times_EM[j, :] = S[j][2][np.arange(Nsizes), np.argmax(S[j][1], axis=1)]
+    errs_EM_mean = np.mean(errs_EM, 0)
+    times_EM_mean = np.mean(times_EM, 0)
     
     errs_ac = np.zeros((Niters, Nsizes))
     costs_ac = np.zeros((Niters, Nsizes))
@@ -49,8 +49,9 @@ if __name__ == '__main__':
         errs_ac[j, :] = S[j][3][np.arange(Nsizes), np.argmin(S[j][4], axis=1)]
         costs_ac[j, :] = S[j][4][np.arange(Nsizes), np.argmin(S[j][4], axis=1)]
         times_ac[j, :] = S[j][5][np.arange(Nsizes), np.argmin(S[j][4], axis=1)]
-    errs_ac_mean = np.median(errs_ac, 0)
-    times_ac_mean = np.median(times_ac, 0)
+    errs_ac_mean = np.mean(errs_ac, 0)
+    times_ac_mean = np.mean(times_ac, 0)
+
     # %% plots
     plt.close("all")
     with plt.style.context('ieee'):
@@ -62,11 +63,12 @@ if __name__ == '__main__':
         plt.loglog(sizes**2, errs_ac_mean[5]*(sizes**2/sizes[5]**2)**(-1/2), 'k--', label='_nolegend_', lw=0.5)
         plt.loglog(sizes**2, errs_ac_mean, '.--r', label='Autocorrelation analysis')
         
-        plt.legend(loc=1, fontsize=6)
+        plt.legend(loc=1)#, fontsize=6)
         
         plt.xlabel('Measurement size [pixels]')
         
-        plt.ylabel('Median estimation error')
+        plt.ylabel('Mean estimation error')
+        plt.ylim((10**-2, 10**0))
         fig.tight_layout()
         plt.show()
         plt.savefig(r'C:\Users\kreym\Google Drive\PhD\Documents\MTD-2D-EM-ICASSP\figures/experiment_size_err.pdf')
@@ -74,15 +76,17 @@ if __name__ == '__main__':
         
         fig = plt.figure()
 
-        plt.semilogx(sizes**2, times_EM_mean, '.-b', label=r'Approximate EM')
+        plt.loglog(sizes**2, times_EM_mean, '.-b', label=r'Approximate EM')
+        plt.loglog(sizes**2, times_EM_mean[5]*(sizes**2/sizes[5]**2)**(1), 'k--', label='_nolegend_')
 
-        plt.semilogx(sizes**2, times_ac_mean, '.--r', label='Autocorrelation analysis')
+        plt.loglog(sizes**2, times_ac_mean, '.--r', label='Autocorrelation analysis')
         
-        plt.legend(loc=2, fontsize=6)
+        plt.legend(loc=2)#, fontsize=6)
         
         plt.xlabel('Measurement size [pixels]')
         
-        plt.ylabel('Median computation time [CPU sec]')
+        plt.ylabel('Mean computation time [sec]')
+        plt.ylim((10**1, 10**4))
         fig.tight_layout()
         plt.show()
         plt.savefig(r'C:\Users\kreym\Google Drive\PhD\Documents\MTD-2D-EM-ICASSP\figures/experiment_size_time.pdf')

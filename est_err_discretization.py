@@ -51,34 +51,36 @@ if __name__ == '__main__':
     # %% plots
     plt.close("all")
     with plt.style.context('ieee'):
-        fig = plt.figure()
+        fig, ax = plt.subplots()
         # plt.loglog(Ks, errs_EM_mean[-1]*(Ks/Ks[-1])**(-1/2), 'k--', label='_nolegend_', lw=0.5)
-        plt.semilogy(Ks, errs_EM_mean, '.-b', label=r'Approximate EM')
+        plt.loglog(Ks, errs_EM_mean, '.-b', basex=2, basey=10, label=r'Approximate EM')
     
-        plt.semilogy(Ks, errs_ac_mean, '--r', label='Autocorrelation analysis')
+        plt.loglog(Ks, errs_ac_mean, '--r', basex=2, basey=10, label='Autocorrelation analysis')
         
         plt.legend(loc=1)#, fontsize=6)
-        
         plt.xlabel('K')
         
         plt.ylabel('Mean estimation error')
         plt.xticks(Ks)
+        ax.set_xticklabels(["1", "2", "4", "8", "16", "32"])
+        plt.ylim((10**-2, 10**0))
         fig.tight_layout()
         plt.show()
         plt.savefig(r'C:\Users\kreym\Google Drive\PhD\Documents\MTD-2D-EM-ICASSP\figures/experiment_K_err.pdf')
 
-        fig = plt.figure()
+        fig, ax = plt.subplots()
 
-        plt.plot(Ks, times_EM_mean, '.-b', label=r'Approximate EM')
+        plt.loglog(Ks, times_EM_mean, '.-b', basex=2, basey=10, label=r'Approximate EM')
+        plt.loglog(Ks, times_EM_mean[5]*(np.array(Ks)/Ks[5])**(1), 'k--', basex=2, basey=10, label='_nolegend_')
 
-        plt.plot(Ks, times_ac_mean, '--r', label='Autocorrelation analysis')
+        plt.loglog(Ks, times_ac_mean, '--r', basex=2, basey=10, label='Autocorrelation analysis')
         
         plt.legend(loc=2)#, fontsize=6)
         
         plt.xlabel('K')
         plt.xticks(Ks)
-        
-        plt.ylabel('Mean computation time [CPU sec]')
+        ax.set_xticklabels(["1", "2", "4", "8", "16", "32"])
+        plt.ylabel('Mean computation time [sec]')
         fig.tight_layout()
         plt.show()
         plt.savefig(r'C:\Users\kreym\Google Drive\PhD\Documents\MTD-2D-EM-ICASSP\figures/experiment_K_time.pdf')
