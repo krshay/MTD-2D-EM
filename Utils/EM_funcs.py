@@ -14,7 +14,7 @@ from Utils.fb_funcs import min_err_coeffs
 
 import time
 
-def EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2, z_real):
+def EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2):
     z_k = z_init
     rho_k = rho_init
     Phi = calc_Phi(K)
@@ -41,13 +41,8 @@ def EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2, z_real):
         rho_updated = rho_step(pl_phi_k, Nd)
         z_k = z_updated
         rho_k = rho_updated
-        if count > 30: # (not np.isinf(log_likelihood) and count != 1 and log_likelihood - log_likelihood_prev < 1) or 
-            # if count > 10:
-            #     print('finished after 10 iterations')
+        if (not np.isinf(log_likelihood) and count != 1 and log_likelihood - log_likelihood_prev < 0.5) or count > 12:
             break
-        print(log_likelihood)
-        err = min_err_coeffs(z_real, z_k, kvals)
-        print(f'the error is {err[0]}')
         log_likelihood_prev = log_likelihood
         count += 1
     return z_k, rho_k, log_likelihood
@@ -112,7 +107,7 @@ def PsiPsi(B, L, K, nu, kvals):
                     PsiPsi[iPhi, l[0], l[1], i, j] = np.sum(B_CTZ[ :, :, i] * B_CTZ[ :, :, j])
     return PsiPsi
 
-def EM_parallel(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2, BCTZs, PsiPsi_vals):
+def EM_parallel(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2, BCTZs, PsiPsi_vals, z_true):
     num_cpus = mp.cpu_count()
     pool = mp.Pool(num_cpus)
     z_k = z_init
@@ -120,18 +115,22 @@ def EM_parallel(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2, BCTZs,
     Phi = calc_Phi(K)
     Ls = calc_shifts(L)
     Phi_Ls = set_Phi_Ls(Phi, Ls)
-    Phi_Ls_split = np.array_split(Phi_Ls, num_cpus)
+    num_splits = 80
+    Phi_Ls_split = np.array_split(Phi_Ls, num_splits)
     Msplit = np.array_split(Ms, num_cpus, 2)
     pM_k = np.zeros((K, 2*L, 2*L, Nd))
+    S = np.zeros((K, 2*L, 2*L, Nd))
+
     B = rearangeB(B)
     log_likelihood_prev = 0
     count = 1
     while True:
+        err = min_err_coeffs(z_true, z_k, kvals)
+        print(f'error = {err[0]}')
         st = time.time()
-        Ss = pool.starmap(calc_pMm_l_phi_z, [[Ms, Phi_Ls_split[i], z_k, kvals, Bk, L] for i in range(num_cpus)])
+        Ss = pool.starmap(calc_pMm_l_phi_z, [[Ms, Phi_Ls_split[i], z_k, kvals, Bk, L] for i in range(num_splits)])
         S = np.reshape(Ss, (K, 2*L, 2*L, Nd))
         print(f'computing S took {time.time() - st} secs')
-        
         S_normalized = S - np.min(S, axis=(0, 1, 2))
         pM_k = np.exp(-S_normalized / (2 * sigma2))
         pM_k_likelihood = np.exp(-S / (2 * sigma2))
@@ -147,11 +146,13 @@ def EM_parallel(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2, BCTZs,
         rho_updated = rho_step(pl_phi_k, Nd)
         z_k = z_updated
         rho_k = rho_updated
-        if not np.isinf(log_likelihood) and count != 1 and log_likelihood - log_likelihood_prev < 100 or count > 19:
-            break
         print(log_likelihood)
+        if count > 100:
+            break
+
         log_likelihood_prev = log_likelihood
         count += 1
+
     return z_k, rho_k, log_likelihood, count
 
 def z_step_parallel(pl_phi_ks, Ms, BCTZs, Phi, Ls, L, K, nu, kvals, sigma2, PsiPsi_vals, pool):

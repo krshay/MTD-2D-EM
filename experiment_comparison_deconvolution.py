@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Sep 15 17:22:20 2021
+Created on Wed Sep 29 21:34:19 2021
 
 @author: Shay Kreymer
 """
 
+
 import numpy as np
 import matplotlib.pyplot as plt
 import multiprocessing as mp
-from Utils.calc_err_SNR import calc_err_SNR_both
+from Utils.calc_err_SNR import calc_err_SNR_comparison
 
 plt.close("all")
 
@@ -17,16 +18,16 @@ if __name__ == '__main__':
     Niters = 40
     L = 5
     ne = 10
-    NSNRs = 18
-    SNRs = np.logspace(-2, 2, NSNRs)
+    NSNRs = 10
+    SNRs = np.logspace(0, 2, NSNRs)
     
-    N = 1500
+    N = 70
     gamma = 0.04
     K = 16
     num_cpus = mp.cpu_count()
     # %% EM and Autocorrelation Analysis
     pool = mp.Pool(num_cpus)
-    S = pool.starmap(calc_err_SNR_both, [[L, ne, SNRs, N, gamma, K, i] for i in range(Niters)])
+    S = pool.starmap(calc_err_SNR_comparison, [[L, ne, SNRs, N, gamma, K, i] for i in range(Niters)])
     pool.close()
     pool.join() 
     
@@ -49,6 +50,11 @@ if __name__ == '__main__':
         times_ac[j, :] = S[j][5][np.arange(NSNRs), np.argmin(S[j][4], axis=1)]
     errs_ac_mean = np.mean(errs_ac, 0)
     times_ac_mean = np.mean(times_ac, 0)
+    
+    errs_conv = np.zeros((Niters, NSNRs))
+    for j in range(Niters):
+        errs_conv[j, :] = S[j][6][np.arange(NSNRs), 0]
+    errs_conv_mean = np.mean(errs_conv, 0)
     # %% plots
     plt.close("all")
     with plt.style.context('ieee'):
@@ -58,7 +64,7 @@ if __name__ == '__main__':
         # plt.loglog(SNRs, errs_ac_mean[4]*(SNRs/SNRs[4])**(-3/2), 'k--', label='_nolegend_', lw=0.5)
 
         plt.loglog(SNRs, errs_ac_mean, '.--r', label='Autocorrelation analysis')
-        
+        plt.loglog(SNRs, errs_conv_mean, label='oracle-deconvolution')
         plt.legend(loc=1)#, fontsize=6)
         
         plt.xlabel('SNR')

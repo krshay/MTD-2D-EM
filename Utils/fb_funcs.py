@@ -231,3 +231,25 @@ def calcT(nu, kvals):
     
     return T
     
+def symmetric_target(L, ne):
+    """ Generated a rotationally-symmetric target image, expanded by required number of expansion coefficients
+    Args:
+        L: diameter of the target image (in pixels)
+        ne: required number of expansion coefficients
+        
+    Returns:
+        Xsymm: a rotationally-symmetric target image
+    """
+    X = np.random.rand(L, L)
+    B, z, roots, kvals, nu = expand_fb(X, ne)
+    T = calcT(nu, kvals)
+    c = np.real(T @ z)
+    Bk = np.zeros((2*L-1, 2*L-1, nu), dtype=np.complex_)
+    for ii in range(nu):
+        Bk[ :, :, ii] = np.fft.fft2(np.pad(np.reshape(B[ :, ii], (L, L)), L//2))
+    Xsymm = np.zeros(np.shape(X))
+    for theta in np.linspace(0, 2*np.pi, 3600):
+        Xsymm += rot_img_freqT(theta, c, kvals, Bk, L, T)
+    Xsymm = Xsymm / np.linalg.norm(Xsymm)
+    return Xsymm
+    

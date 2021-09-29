@@ -17,12 +17,12 @@ from Utils.generate_clean_micrograph_2d import generate_clean_micrograph_2d_rots
 
 if __name__ == '__main__':
     X = plt.imread("./images/molecule9.png")
-    # X = np.random.rand(5, 5)
+    X = np.random.rand(5, 5)
     L = np.shape(X)[0]
     X = X
     W = 2*L-1 # L for arbitrary spacing distribution, 2*L-1 for well-separated
     np.random.seed(1)
-    N = 85
+    N = 55
     ne = 100
     B, z, roots, kvals, nu = expand_fb(X, ne)
     T = calcT(nu, kvals)
@@ -41,7 +41,7 @@ if __name__ == '__main__':
     y_clean, s, locs = generate_clean_micrograph_2d_rots(c, kvals, Bk, W, L, N, 0.30*(N/L)**2, T, seed=100)
 
     gamma = s[0]*(L/N)**2
-    SNR = 1/5
+    SNR = 2
     sigma2 = np.linalg.norm(Xrec)**2 / (SNR * np.pi * (L//2)**2)
     y1 = y_clean + np.random.default_rng().normal(loc=0, scale=np.sqrt(sigma2), size=np.shape(y_clean))
     
@@ -49,7 +49,7 @@ if __name__ == '__main__':
     sigma2 = 0
     y2 = y_clean + np.random.default_rng().normal(loc=0, scale=np.sqrt(sigma2), size=np.shape(y_clean))
     
-    SNR = 5
+    SNR = 50
     sigma2 = np.linalg.norm(Xrec)**2 / (SNR * np.pi * (L//2)**2)
     y3 = y_clean + np.random.default_rng().normal(loc=0, scale=np.sqrt(sigma2), size=np.shape(y_clean))
     
