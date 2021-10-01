@@ -41,7 +41,7 @@ def EM(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2):
         rho_updated = rho_step(pl_phi_k, Nd)
         z_k = z_updated
         rho_k = rho_updated
-        if (not np.isinf(log_likelihood) and count != 1 and log_likelihood - log_likelihood_prev < 0.5) or count > 12:
+        if (not np.isinf(log_likelihood) and count != 1 and log_likelihood - log_likelihood_prev < 0.5) or count > 9:
             break
         log_likelihood_prev = log_likelihood
         count += 1
@@ -126,11 +126,11 @@ def EM_parallel(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2, BCTZs,
     count = 1
     while True:
         err = min_err_coeffs(z_true, z_k, kvals)
-        print(f'error = {err[0]}')
+        # print(f'error = {err[0]}')
         st = time.time()
         Ss = pool.starmap(calc_pMm_l_phi_z, [[Ms, Phi_Ls_split[i], z_k, kvals, Bk, L] for i in range(num_splits)])
         S = np.reshape(Ss, (K, 2*L, 2*L, Nd))
-        print(f'computing S took {time.time() - st} secs')
+        # print(f'computing S took {time.time() - st} secs')
         S_normalized = S - np.min(S, axis=(0, 1, 2))
         pM_k = np.exp(-S_normalized / (2 * sigma2))
         pM_k_likelihood = np.exp(-S / (2 * sigma2))
@@ -142,12 +142,12 @@ def EM_parallel(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2, BCTZs,
         pl_phi_ks = np.array_split(pl_phi_k, num_cpus, 3)
         st = time.time()
         z_updated = z_step_parallel(pl_phi_ks, Msplit, BCTZs, Phi, Ls, L, K, nu, kvals, sigma2, PsiPsi_vals, pool)
-        print(f'computing updated z took {time.time() - st} secs')
+        # print(f'computing updated z took {time.time() - st} secs')
         rho_updated = rho_step(pl_phi_k, Nd)
         z_k = z_updated
         rho_k = rho_updated
-        print(log_likelihood)
-        if count > 100:
+        # print(log_likelihood)
+        if count > 8:
             break
 
         log_likelihood_prev = log_likelihood
