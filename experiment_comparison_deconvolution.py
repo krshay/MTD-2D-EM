@@ -21,9 +21,9 @@ if __name__ == '__main__':
     NSNRs = 10
     SNRs = np.logspace(0, 2, NSNRs)
     
-    N = 70
+    N = 5000
     gamma = 0.04
-    K = 16
+    K = 1
     num_cpus = mp.cpu_count()
     # %% EM and Autocorrelation Analysis
     pool = mp.Pool(num_cpus)

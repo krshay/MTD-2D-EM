@@ -273,7 +273,6 @@ def calc_err_SNR_comparison(L, ne, SNRs, N, gamma, K, sd):
         conv_result = signal.fftconvolve(Xrec, y)
 
         peaks = photutils.detection.find_peaks(conv_result, threshold=0, box_size=5, npeaks=len(locs))
-        
         x_peaks = (peaks['y_peak']).astype(int)
         y_peaks = (peaks['x_peak']).astype(int)
         peaks_locs = np.zeros((len(x_peaks), 2), dtype=int)

@@ -17,12 +17,12 @@ if __name__ == '__main__':
     Niters = 40
     L = 5
     ne = 10
-    NSNRs = 18
-    SNRs = np.logspace(-2, 2, NSNRs)
+    NSNRs = 10
+    SNRs = np.logspace(0, 1.7, NSNRs)
     
-    N = 1500
+    N = 2000
     gamma = 0.04
-    K = 16
+    K = 8
     num_cpus = mp.cpu_count()
     # %% EM and Autocorrelation Analysis
     pool = mp.Pool(num_cpus)
