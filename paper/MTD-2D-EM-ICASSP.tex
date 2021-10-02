@@ -95,7 +95,9 @@ M[\vec{\ell}] = \sum_{i=1}^{p} F_{\phi_i}[\vec{\ell} - \vec{\ell}_i] + \varepsil
 \end{equation}
 where \mbox{$F_{\phi_i} [\vec{\ell}] := f_{\phi_i} (\vec{\ell} / n)$} is a discrete copy of~$f$, rotated by angle~$\phi_i$ about the origin;~$n$ is the radius of the image in pixels; \mbox{$\{\phi_i\}_{i=1}^{p} \sim \Unif[0, 2\pi)$} are uniformly distributed rotations; \mbox{$\{\vec{\ell}_i\}_{i=1}^{p} \in \{n + 1, \ldots, N-n\}^2$} are arbitrary translations;  and $\varepsilon[\vec{\ell}]$ is i.i.d.\ Gaussian noise with zero mean and \mbox{variance~$\sigma^2$}. The rotations, translations, and the number of occurrences of~$f$ in~$M$, denoted by~$p$, are unknown. Importantly, since the rotations are unknown, it is possible to reconstruct the target image only up to a rotation.
 
-Following~~\cite{marshall2020image, bendory2021multi, kreymer2021two}, we assume that the image~$f$ is supported on the unit disk \mbox{$D = \{\vec{x} \in \mathbb{R}^2: |\vec{x}| \le 1\}$} and has a finite expansion in the basis of Dirichlet Laplacian eigenfunctions. In particular, the image~$f$ can be expanded as
+Following~\cite{marshall2020image, bendory2021multi, kreymer2021two}, we assume that the image~$f$ is supported on the unit disk \mbox{$\{\vec{x} \in \mathbb{R}^2: |\vec{x}| \le 1\}$}
+%\mbox{$D = \{\vec{x} \in \mathbb{R}^2: |\vec{x}| \le 1\}$} 
+and has a finite expansion in the basis of Dirichlet Laplacian eigenfunctions. In particular, the image~$f$ can be expanded as
 \begin{equation}
 \label{eq:expansion}
 f (r, \theta) = \sum_{(\nu, q): \lambda_{\nu, q} \le \lambda} \alpha_{\nu, q} \psi_{\nu, q} (r, \theta),
