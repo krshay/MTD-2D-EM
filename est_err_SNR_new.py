@@ -53,9 +53,10 @@ if __name__ == '__main__':
         plt.xlabel('SNR')
         
         plt.ylabel('Mean estimation error')
+        plt.ylim((10**-2, 0.35))
         fig.tight_layout()
         plt.show()
-        # plt.savefig(r'C:\Users\kreym\Google Drive\PhD\Documents\MTD-2D-EM-ICASSP\figures/experiment_SNR_err.pdf')
+        # plt.savefig(r'C:\Users\kreym\Documents\GitHub\MTD-2D-EM\paper\figures/experiment_SNR_err.pdf')
 
         # fig = plt.figure()
 
