@@ -45,11 +45,11 @@ if __name__ == '__main__':
     _, z_init, _, _, _ = expand_fb(F_init, ne)
     c_initial = np.real(T @ z_init)
     
-    SNR = 2
+    SNR = 5
     sigma2 = np.linalg.norm(F)**2 / (L**2 *SNR)
     
     gamma = 0.04
-    N = 10000
+    N = 1000
     N = (N // L) * L
     M_clean, s, locs = generate_clean_micrograph_2d_rots(c, kvals, Bk, W, L, N, gamma*(N/L)**2, T, seed=100)
 
@@ -121,12 +121,12 @@ if __name__ == '__main__':
         z_ests_ac[g, :] = z_est_ac
         gamma_ests_ac[g] = gamma_est_ac
     
-    # %% Approximate EM
-    Bs = rearangeB(B)
-    PsiPsi_vals = PsiPsi(Bs, L, K, nu, kvals)
-    BCTZs = calcB_CTZs(B, K, L, kvals)
-    start = time.time()
-    z_est_parallel, rho_est, log_likelihood, numiters = EM_parallel(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2, BCTZs, PsiPsi_vals, z)
-    print(time.time() - start)
+    # # %% Approximate EM
+    # Bs = rearangeB(B)
+    # PsiPsi_vals = PsiPsi(Bs, L, K, nu, kvals)
+    # BCTZs = calcB_CTZs(B, K, L, kvals)
+    # start = time.time()
+    # z_est_parallel, rho_est, log_likelihood, numiters = EM_parallel(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2, BCTZs, PsiPsi_vals, z)
+    # print(time.time() - start)
     
 
