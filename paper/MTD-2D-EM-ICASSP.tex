@@ -172,7 +172,7 @@ p(M_0, M_1, \ldots, M_{N_d-1}|\alpha) \approx \prod_{m = 0}^{N_d - 1} p(M_m|\alp
 \end{equation}
 where~$M_m$ is the~$m^{\text{th}}$ patch, and we neglect statistical dependencies between patches. Our approximate~EM algorithm works by applying the EM algorithm to estimate the approximate MMLE of~(\ref{eq:approx_likelihood}).
 
-The separation condition~(\ref{eq:sep}) implies that each patch $M_m$ can contain either no target image, a full  target image, or part of a rotated image; overall there are~$(2L-1)^2$  possibilities. In particular, each patch can be modeled by
+The separation condition~(\ref{eq:sep}) implies that each patch $M_m$ can contain either no target image, a full  target image, or part of a rotated image; overall there are~$(2L)^2$  possibilities. In particular, each patch can be modeled by
 \begin{equation}
 \label{eq:patch}
 M_m = C T_{\vec{\ell}_m} Z F_{\phi_m} + \varepsilon_m, \quad \varepsilon_m \sim \mathcal{N}(0, \sigma^2 I_{L \times L}),
@@ -214,10 +214,10 @@ Q(\alpha, \rho|\alpha_k, \rho_k) = \sum_{m = 0}^{N_d - 1} \sum_{\vec{\ell} \in \
 \end{multline}
 where~$p(M_m|\vec{\ell}, \phi, \alpha)$ is given by~(\ref{eq:likelihood_patch}).
 
-The~\mbox{M-step} updates the image estimate $\alpha$ and~$\rho$ by maximizing~$Q(\alpha, \rho|\alpha_k, \rho_k)$ under the constraint that~$\rho$ lies on the simplex~$\Delta_{(2L-1)^2}$:
+The~\mbox{M-step} updates the image estimate $\alpha$ and~$\rho$ by maximizing~$Q(\alpha, \rho|\alpha_k, \rho_k)$ under the constraint that~$\rho$ lies on the simplex~$\Delta_{4L^2}$:
 \begin{equation}
 \label{eq:M_step}
-\alpha_{k+1}, \rho_{k+1} = \arg \max_{\alpha, \rho} Q(\alpha, \rho|\alpha_k, \rho_k) \text{ s.t. } \rho \in \Delta_{(2L-1)^2}.
+\alpha_{k+1}, \rho_{k+1} = \arg \max_{\alpha, \rho} Q(\alpha, \rho|\alpha_k, \rho_k) \text{ s.t. } \rho \in \Delta_{4L^2}.
 \end{equation}
 The constrained maximization of~(\ref{eq:M_step}) can be achieved with the unconstrained maximization of the Lagrangian
 \begin{equation}
