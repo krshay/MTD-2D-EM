@@ -40,10 +40,11 @@
 
 
 \DeclareMathOperator{\Unif}{Unif}
+
 % spacing below figures
 \usepackage{setspace}
 \onehalfspacing
-\captionsetup{belowskip=-5pt}
+%\captionsetup{belowskip=-10pt}
 
 %% spacing between bibliography items
 %\let\oldthebibliography=\thebibliography
@@ -72,8 +73,8 @@ $^\dagger$Department of Mathematics and PACM, Princeton University, Princeton, N
 \begin{document}
 \ninept
 % spacing above/below equations
-\setlength{\abovedisplayskip}{3pt}
-\setlength{\belowdisplayskip}{3pt}
+%\setlength{\abovedisplayskip}{2pt}
+%\setlength{\belowdisplayskip}{2pt}
 %
 \maketitle
 %
@@ -85,6 +86,8 @@ We consider the two-dimensional multi-target detection (MTD) problem of estimati
 Expectation-maximization, multi-target detection, cryo-electron microscopy.
 \end{keywords}
 %
+
+%\setlength{\textfloatsep}{5pt}% Remove \textfloatsep
 
 \section{Introduction}
 \label{sec:introduction}
@@ -239,6 +242,7 @@ for~$\vec{\ell} \in \mathbb{L}$. We thus obtain the update rule for~$\rho$ as
 \end{equation}
 and~$\eta = N_d$ from the normalization~\mbox{$\sum_{\vec{\ell} \in \mathbb{L}} \rho[\vec{\ell}] = 1$}. The approximate EM algorithm is summarized in Algorithm~\ref{alg:approx_EM}.
 
+
 \begin{algorithm}[!tb]
   \caption{Approximate EM for \mbox{2-D} MTD}\label{alg:approx_EM}
 \KwIn{measurement~$M$; noise variance~$\sigma^2$; initial guesses~$\alpha_0$ and~$\rho_0$; parameter~$K$~\eqref{eq:Phi_set}; stopping parameter~$\epsilon$}
@@ -254,43 +258,72 @@ calculate~$Q_{k+1}$ according to~(\ref{eq:Q_func_well_general});\\
 set $k \rightarrow k + 1$;
   }
 \end{algorithm}
+%\textfloatsep
 
 \begin{figure}[!tb]
 	\begin{subfigure}[ht]{\columnwidth}
 		\centering
-		\includegraphics[width=0.85\columnwidth]{figures/experiment_SNR_err.pdf}
+		\includegraphics[width=0.75\columnwidth]{figures/experiment_SNR_err.pdf}
 	\end{subfigure}
 	\caption{The mean estimation error of recovering the target image~$F$, as a function of the SNR, by approximate EM (Algorithm~\ref{alg:approx_EM}) and autocorrelation analysis.}
 \label{fig:noise_experiment}
 \end{figure}
 
-\begin{figure*}[!tb]
-	\begin{subfigure}[ht]{\columnwidth}
+\begin{figure}[!tb]
+	\begin{subfigure}[ht]{.5\columnwidth}
 		\centering
-		\includegraphics[width=0.85\columnwidth]{figures/experiment_size_err.pdf}
+		\includegraphics[width=1\columnwidth]{figures/experiment_size_err.pdf}
 	\end{subfigure}
-	\hfill
-	\begin{subfigure}[ht]{\columnwidth}
+	\begin{subfigure}[ht]{.5\columnwidth}
 		\centering
-		\includegraphics[width=0.85\columnwidth]{figures/experiment_size_time.pdf}
+		\includegraphics[width=1\columnwidth]{figures/experiment_size_time.pdf}
 	\end{subfigure}
 	\caption{The mean estimation error of recovering the target image~$F$ (left) and running time (right), as a function of measurement size $N^2$ by approximate EM and autocorrelation analysis. For the estimation error, the black dashed lines illustrate a slope of~$-1/2$, as predicted by the law of large numbers. For the computation time, the black dashed line illustrates a slope of~$1$, implying a linear increase in computation time, as the number of patches~\mbox{$N_d = N^2 / L^2$} grows linearly in~$N^2$.}
 \label{fig:size_experiment}
-\end{figure*}
+\end{figure}
 
-\begin{figure*}[!tb]
-	\begin{subfigure}[ht]{\columnwidth}
+
+%\begin{figure*}[!tb]
+%	\begin{subfigure}[ht]{\columnwidth}
+%		\centering
+%		\includegraphics[width=0.75\columnwidth]{figures/experiment_size_err.pdf}
+%	\end{subfigure}
+%	\hfill
+%	\begin{subfigure}[ht]{\columnwidth}
+%		\centering
+%		\includegraphics[width=0.75\columnwidth]{figures/experiment_size_time.pdf}
+%	\end{subfigure}
+%	\caption{The mean estimation error of recovering the target image~$F$ (left) and running time (right), as a function of measurement size $N^2$ by approximate EM and autocorrelation analysis. For the estimation error, the black dashed lines illustrate a slope of~$-1/2$, as predicted by the law of large numbers. For the computation time, the black dashed line illustrates a slope of~$1$, implying a linear increase in computation time, as the number of patches~\mbox{$N_d = N^2 / L^2$} grows linearly in~$N^2$.}
+%	\label{fig:size_experiment}
+%\end{figure*}
+
+\begin{figure}[!tb]
+	\begin{subfigure}[ht]{.5\columnwidth}
 		\centering
-		\includegraphics[width=0.85\columnwidth]{figures/experiment_K_err.pdf}
+		\includegraphics[width=1\columnwidth]{figures/experiment_K_err.pdf}
 	\end{subfigure}
 	\hfill
-	\begin{subfigure}[ht]{\columnwidth}
+	\begin{subfigure}[ht]{.5\columnwidth}
 		\centering
-		\includegraphics[width=0.85\columnwidth]{figures/experiment_K_time.pdf}
+		\includegraphics[width=1\columnwidth]{figures/experiment_K_time.pdf}
 	\end{subfigure}
 	\caption{The mean estimation error of recovering the target image~$F$ (left) and running time (right), as a function of~$K$---the size of the search space of rotations~\eqref{eq:Phi_set}---by approximate EM. The recovery error and running time using autocorrelation analysis are marked by the dashed horizontal red lines. For the running time, the black dashed line illustrates a slope of~$1$, which implies a linear increase in computation time, as the number of computations per patch depends linearly on~$K$. The results suggest that one can save running time by coarsely sampling  the rotations  without severely degrading  the estimation quality.}
-\label{fig:discretization_experiment}
-\end{figure*}
+	\label{fig:discretization_experiment}
+\end{figure}
+
+%\begin{figure*}[!tb]
+%	\begin{subfigure}[ht]{\columnwidth}
+%		\centering
+%		\includegraphics[width=0.75\columnwidth]{figures/experiment_K_err.pdf}
+%	\end{subfigure}
+%	\hfill
+%	\begin{subfigure}[ht]{\columnwidth}
+%		\centering
+%		\includegraphics[width=0.75\columnwidth]{figures/experiment_K_time.pdf}
+%	\end{subfigure}
+%	\caption{The mean estimation error of recovering the target image~$F$ (left) and running time (right), as a function of~$K$---the size of the search space of rotations~\eqref{eq:Phi_set}---by approximate EM. The recovery error and running time using autocorrelation analysis are marked by the dashed horizontal red lines. For the running time, the black dashed line illustrates a slope of~$1$, which implies a linear increase in computation time, as the number of computations per patch depends linearly on~$K$. The results suggest that one can save running time by coarsely sampling  the rotations  without severely degrading  the estimation quality.}
+%\label{fig:discretization_experiment}
+%\end{figure*}
 
 \section{Numerical experiments}
 \label{sec:numeric}
