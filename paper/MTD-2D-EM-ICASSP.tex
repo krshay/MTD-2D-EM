@@ -163,7 +163,7 @@ to estimate small molecular structures using cryo-EM~\cite{bendory2018toward}.
 
 \section{Approximate expectation-maximization}
 \label{sec:EM}
-Given a measurement~$M$ that follows the MTD model~(\ref{eq:model}), the maximum marginal likelihood estimator~(MMLE) for the vector of coefficients~$\alpha$, that represents the target image~$F$~(\ref{eq:expansion}), is the maximizer of the likelihood function~$p(M | \alpha)$. The translations and rotations of the target images within the measurement are treated as nuisance variables. The EM algorithm estimates the MMLE by iteratively applying the expectation~(E) and maximization~(M) steps~\cite{dempster1977maximum}. Specifically, given the current estimate~$\alpha_k$, the \mbox{E-step} computes the expected log-likelihood function, where the expectation is taken over all admissible configurations of translations and rotations. The estimate is then updated in the \mbox{M-step} by maximizing the function with respect to~$\alpha$. Unfortunately, for the MTD model, the number of possible translations grows quickly with the problem size, rendering direct application of EM computationally intractable. Hence, based on~\cite{lan2020multi}, we suggest to apply EM to an approximation of the likelihood function, in which the number of possible translations is linear in~$N^2$.
+Given a measurement~$M$ that follows the MTD model~(\ref{eq:model}), the maximum marginal likelihood estimator~(MMLE) for the vector of coefficients~$\alpha$, that represents the target image~$f$~(\ref{eq:expansion}), is the maximizer of the likelihood function~$p(M | \alpha)$. The translations and rotations of the target images within the measurement are treated as nuisance variables. The EM algorithm estimates the MMLE by iteratively applying the expectation~(E) and maximization~(M) steps~\cite{dempster1977maximum}. Specifically, given the current estimate~$\alpha_k$, the \mbox{E-step} computes the expected log-likelihood function, where the expectation is taken over all admissible configurations of translations and rotations. The estimate is then updated in the \mbox{M-step} by maximizing the function with respect to~$\alpha$. Unfortunately, for the MTD model, the number of possible translations grows quickly with the problem size, rendering direct application of EM computationally intractable. Hence, based on~\cite{lan2020multi}, we suggest to apply EM to an approximation of the likelihood function, in which the number of possible translations is linear in~$N^2$.
 
 The approximate EM begins by partitioning the measurement~$M$ into~$N_d = (N / L)^2$ \mbox{non-overlapping} patches; each patch is of size~\mbox{$L \times L$}, where~\mbox{$L = 2n + 1$} is the diameter of the target image~$F$. Then, we aim to estimate the image by maximizing the approximate likelihood function
 \begin{equation}
@@ -172,22 +172,22 @@ p(M_0, M_1, \ldots, M_{N_d-1}|\alpha) \approx \prod_{m = 0}^{N_d - 1} p(M_m|\alp
 \end{equation}
 where~$M_m$ is the~$m^{\text{th}}$ patch, and we neglect statistical dependencies between patches. Our approximate~EM algorithm works by applying the EM algorithm to estimate the approximate MMLE of~(\ref{eq:approx_likelihood}).
 
-The separation condition~(\ref{eq:sep}) implies that each patch $M_m$ can contain either no target image, a full rotated target image, or part of a rotated image; overall there are~$(2L-1)^2$ possible configurations. In particular, each patch can be modeled by
+The separation condition~(\ref{eq:sep}) implies that each patch $M_m$ can contain either no target image, a full  target image, or part of a rotated image; overall there are~$(2L-1)^2$  possibilities. In particular, each patch can be modeled by
 \begin{equation}
 \label{eq:patch}
 M_m = C T_{\vec{\ell}_m} Z F_{\phi_m} + \varepsilon_m, \quad \varepsilon_m \sim \mathcal{N}(0, \sigma^2 I_{L \times L}),
 \end{equation}
-where the operator~$Z$ \mbox{zero-pads}~$L$ entries to the right and to the bottom of the rotated copy of~$F$, and~$T_{\vec{\ell}_m}$ circularly shifts the \mbox{zero-padded} image by~\mbox{$\vec{\ell}_m = ({\ell_m}_x, {\ell_m}_y)\in \mathbb{L} := \{0, 1, \ldots, 2L-1\}^2$} positions, that is,
+where the operator~$Z$ \mbox{zero-pads}~$L$ entries to the right and to the bottom of a rotated copy of~$F$, and~$T_{\vec{\ell}_m}$ circularly shifts the \mbox{zero-padded} image by~\mbox{$\vec{\ell}_m = ({\ell_m}_x, {\ell_m}_y)\in \mathbb{L} := \{0, 1, \ldots, 2L-1\}^2$} positions, that is,
 \begin{multline}
-T_{\vec{l}_m} Z F_{\phi_m} \left[i, j\right] = \\Z F_{\phi_m} \left[(i + {\ell_m}_x) \text{ mod } 2L, (j + {\ell_m}_y) \text{ mod } 2L\right].
+(T_{\vec{\ell}_m} Z F_{\phi_m} )\left[i, j\right] = \\(Z F_{\phi_m}) \left[(i + {\ell_m}_x) \bmod 2L, (j + {\ell_m}_y) \bmod  2L\right].
 \end{multline}
 %where~$\vec{\ell}_m \in \mathbb{L} := \{0, 1, \ldots, 2L-1\}^2$ is treated as a random variable.
-The operator~$C$ then crops the first~$L$ entries in the vertical and horizontal axes, and the result is further corrupted by additive white Gaussian noise. In addition, since the EM algorithm assigns probabilities to different rotations (in the expectation step), we need to discretize the search space of rotations:
+The operator~$C$ then crops the first~$L$ entries in the vertical and horizontal axes, and the result is further corrupted by additive white Gaussian noise. In addition, since the EM algorithm assigns probabilities to rotations (in the expectation step), we need to discretize the search space of rotations:
 \begin{equation}
 \label{eq:Phi_set}
-\phi_m \in \Phi := \left\{k \frac{2\pi}{K}\right\}_{k=0}^{K-1},
+\phi_m \in \Phi := \left\{k \frac{2\pi}{K}\right\} \quad k=0,\ldots,K-1,
 \end{equation}
-where~$K$ is a parameter chosen by the user. Higher~$K$ means higher accuracy at the cost of running time (see Figure~\ref{fig:discretization_experiment}).
+where~$K$ is a parameter chosen by the user. Higher~$K$ provides higher accuracy at the cost of running time (see Figure~\ref{fig:discretization_experiment}).
 
 In the E-step, our algorithm calculates the expected log-likelihood function of the model~(\ref{eq:patch})
 \begin{equation}
@@ -204,26 +204,26 @@ with the normalization~\mbox{$\sum_{\vec{\ell} \in \mathbb{L}} \sum_{\phi \in \P
 p(\vec{\ell}, \phi|M_m, \alpha_k) = \frac{p(M_m|\vec{\ell}, \phi, \alpha_k) p(\vec{\ell}, \phi|\alpha_k)}{\sum_{\vec{\ell'} \in \mathbb{L}} \sum_{\phi' \in \Phi} p(M_m|\vec{\ell'}, \phi', \alpha_k) p(\vec{\ell'}, \phi'|\alpha_k)},
 \end{equation}
 which is the normalized likelihood function~$p(M_m|\vec{\ell}, \phi, \alpha_k)$, weighted by the prior distribution~$p(\vec{\ell}, \phi| \alpha_k)$. We assume that~$p(\vec{\ell},\phi|\alpha_k)=p(\vec{\ell})p(\phi)$, namely,~$\vec{\ell}$ and~$\phi$ are independent of~$\alpha_k$ and of each other.
-We also assume that the rotations are drawn from a uniform distribution in the set~$\Phi$ from~(\ref{eq:Phi_set}), and therefore
+We also assume that the rotations are drawn from a uniform distribution over the set~$\Phi$ from~(\ref{eq:Phi_set}), and therefore
 \begin{equation}
 p(\vec{\ell}, \phi|\alpha_k) = \rho[\vec{\ell}] \frac{1}{K},
 \end{equation}
-where~$\rho[\vec{\ell}]$ is the distribution of 2-D translations in~\eqref{eq:patch} (which should be estimated simultaneously with $\alpha$). We can rewrite~(\ref{eq:Q_func_well_general}) as (up to a constant):
+where~$\rho[\vec{\ell}]$ is the distribution of 2-D translations in~\eqref{eq:patch} (which should be estimated simultaneously with $\alpha$). We can rewrite~(\ref{eq:Q_func_well_general}), up to a constant, as:
 \begin{multline}
 Q(\alpha, \rho|\alpha_k, \rho_k) = \sum_{m = 0}^{N_d - 1} \sum_{\vec{\ell} \in \mathbb{L}} \sum_{\phi \in \Phi} p(M_m|\vec{\ell}, \phi, \alpha_k) \rho_k[\vec{\ell}] \\ \times \left(\log p(M_m|\vec{\ell}, \phi, \alpha) + \log \rho[\vec{\ell}]\right),
 \end{multline}
 where~$p(M_m|\vec{\ell}, \phi, \alpha)$ is given by~(\ref{eq:likelihood_patch}).
 
-The~\mbox{M-step} updates the image estimate and~$\rho$ by maximizing~$Q(\alpha, \rho|\alpha_k, \rho_k)$ under the constraint that~$\rho$ lies on the simplex~$\Delta_{2L \times 2L}$:
+The~\mbox{M-step} updates the image estimate $\alpha$ and~$\rho$ by maximizing~$Q(\alpha, \rho|\alpha_k, \rho_k)$ under the constraint that~$\rho$ lies on the simplex~$\Delta_{(2L-1)^2}$:
 \begin{equation}
 \label{eq:M_step}
-\alpha_{k+1}, \rho_{k+1} = \arg \max_{\alpha, \rho} Q(\alpha, \rho|\alpha_k, \rho_k) \text{ s.t. } \rho \in \Delta_{2L \times 2L}.
+\alpha_{k+1}, \rho_{k+1} = \arg \max_{\alpha, \rho} Q(\alpha, \rho|\alpha_k, \rho_k) \text{ s.t. } \rho \in \Delta_{(2L-1)^2}.
 \end{equation}
 The constrained maximization of~(\ref{eq:M_step}) can be achieved with the unconstrained maximization of the Lagrangian
 \begin{equation}
 \mathcal{L}(\alpha, \rho, \eta) = Q(\alpha, \rho|\alpha_k, \rho_k) + \eta \left(1 - \sum_{\vec{\ell} \in \mathbb{L}} \rho[\vec{\ell}] \right),
 \end{equation}
-where~$\eta$ is the Lagrange multiplier. As we will see next, the constraint is automatically satisfied at the   maximum of the Lagrangian.
+where~$\eta$ is the Lagrange multiplier. As we will see next, the constraint of~\eqref{eq:M_step} is automatically satisfied at the   maximum of the Lagrangian.
 
  Since~$Q(\alpha, \rho|\alpha_k, \rho_k)$ is additively separable for~$\alpha$ and~$\rho$, we maximize~$\mathcal{L}(\alpha, \rho, \eta)$ with respect to~$\alpha$ and~$\rho$ separately. At the maximum of~$\mathcal{L}(\alpha, \rho, \eta)$, we have
 \begin{multline}
@@ -251,7 +251,7 @@ and~$\eta = N_d$ from the normalization~\mbox{$\sum_{\vec{\ell} \in \mathbb{L}} 
 set $k \rightarrow 0$;\\
 calculate~$Q_{0}$ according to~(\ref{eq:Q_func_well_general}) and set $Q_{-1} \rightarrow -\infty$;\\
   \While{$Q_k - Q_{k-1} > \epsilon$}{
-    calculate~$p(M_m|\vec{\ell}, \phi, \alpha_k)$ according to~(\ref{eq:likelihood_patch}) and ;\\
+    calculate~$p(M_m|\vec{\ell}, \phi, \alpha_k)$ according to~(\ref{eq:likelihood_patch});\\
 update~$\alpha_{k+1}$ by solving~(\ref{eq:update_alpha});\\
 update~$\rho_{k+1}$ according to~(\ref{eq:update_rho});\\
 calculate~$Q_{k+1}$ according to~(\ref{eq:Q_func_well_general});\\
