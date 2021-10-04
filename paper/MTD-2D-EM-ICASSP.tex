@@ -348,8 +348,7 @@ Figure~\ref{fig:size_experiment} presents recovery error and running time as a f
 
 \subsection{Recovery error as a function of discretization of rotations}
 \label{subsec:exp_discretization}
-Figure~\ref{fig:discretization_experiment} presents recovery error and running time as a function of~$K$, the size of the search space of rotations, for measurements with~\mbox{$\text{SNR} = 5$}, $N = 1500$, and one  initial guess for~$\alpha$. %The results are compared against autocorrelation analysis.
-Remarkably, even when the EM searches over only~$4$ rotations (recall that the rotations are drawn from a continuous distribution), the obtained estimation error is similar to the estimation error of autocorrelation analysis, which takes all possible (infinitely many) rotations into account. As expected, the computation time grows linearly with the parameter~$K$. This implies that one can save running time by coarsely sampling  the search space of rotations without severely degrading  the estimation quality.
+Figure~\ref{fig:discretization_experiment} presents recovery error and running time as a function of~$K$, the size of the search space of rotations, for measurements with~\mbox{$\text{SNR} = 5$}, $N^2 = 1500^2 \text{ pixels}$, and one  initial guess for~$\alpha$. Remarkably, even when the EM searches over only~$4$ rotations (recall that the rotations are drawn from a continuous distribution), the obtained estimation error is similar to the estimation error of autocorrelation analysis, which takes all possible (infinitely many) rotations into account. As expected, the computation time grows linearly with the parameter~$K$. This implies that one can save running time by coarsely sampling  the search space of rotations without severely degrading  the estimation quality.
 
 \section{Conclusion}
 \label{sec:conclusion}
