@@ -44,7 +44,7 @@
 % spacing below figures
 \usepackage{setspace}
 \onehalfspacing
-%\captionsetup{belowskip=-10pt}
+\captionsetup{belowskip=-2pt}
 
 %% spacing between bibliography items
 %\let\oldthebibliography=\thebibliography
@@ -356,11 +356,14 @@ Remarkably, even when the EM searches over only~$4$ rotations (recall that the r
 
 \section{Conclusion}
 \label{sec:conclusion}
-This paper is motivated by the effort of reconstructing small~\mbox{3-D} molecular structures using \mbox{cryo-EM}, below the current detection limit~\cite{bendory2018toward}. The main contribution of this paper is in introducing an approximate EM scheme for the 2-D MTD problem, and comparing it numerically to autocorrelation analysis. The numerical experiments show an improvement in estimation accuracy, but at the cost of computational time. As Figure~\ref{fig:discretization_experiment} shows, the parameter~$K$ provides an accuracy-running time trade-off. A possible improvement is increasing the resolution of the search space as the iterations progress~\cite{lan2020multi}; this is a standard procedure in current cryo-EM software packages~\cite{scheres2012relion, punjani2017cryosparc}.
+This paper is motivated by the effort of reconstructing small~\mbox{3-D} molecular structures using \mbox{cryo-EM}, below the current detection limit~\cite{bendory2018toward}. The main contribution of this paper is in introducing an approximate EM scheme for the 2-D MTD problem, and comparing it numerically to autocorrelation analysis. The numerical experiments show an improvement in estimation accuracy, but at the cost of computational time. As Figure~\ref{fig:discretization_experiment} shows, the parameter~$K$ provides an accuracy-running time trade-off. A possible improvement is to increase the resolution of the search space as the iterations progress~\cite{lan2020multi}, 
+or to design a branch-and-bound algorithm that accelerates EM by quickly and inexpensively ruling out large regions of the search space that  have very low probability to contain the optimum of the objective function~\cite{punjani2017cryosparc}.
 
-Our ultimate goal is developing an approximate EM scheme for recovering small molecular structures using \mbox{cryo-EM}~\cite{bendory2018toward}. %Although it significantly outperforms autocorrelation analysis in terms of accuracy, a major drawback of the approximate EM method is its computation time. Therefore,
+Our ultimate goal is to develop an approximate EM scheme for recovering small molecular structures using \mbox{cryo-EM}~\cite{bendory2018toward}. %Although it significantly outperforms autocorrelation analysis in terms of accuracy, a major drawback of the approximate EM method is its computation time. Therefore,
 In order to achieve a computationally efficient algorithm for the \mbox{3-D} case of \mbox{cryo-EM}, parallel processing and randomized algorithms, such as stochastic or online EM~\cite{nielsen2000stochastic, chen2018stochastic, liang2009online, cappe2009line, cappe2011online}, must be utilized.
-A further acceleration can be achieved by applying the EM algorithm on a lower dimensional representation of the data~\cite{dvornek2015subspaceem}. Moreover, adding a prior on the target image is expected to improve the robustness and accuracy of the scheme, at the cost of a possible model bias. Another research direction is replacing EM by more intricate techniques that aim to approximate the posterior distribution, such as variational inference~\cite{blei2017variational} or variational auto-encoders~\cite{rosenbaum2021inferring}.
+Further accelerations can be achieved by applying the EM algorithm on a lower dimensional representation of the data~\cite{dvornek2015subspaceem}, 
+and initializing the  EM iterations with efficient computational techniques, such as autocorrelation analysis or stochastic gradient descent~\cite{punjani2017cryosparc}. 
+ Moreover, adding a prior on the target image is expected to improve robustness at the cost of  possible model bias. Another research direction is replacing EM by more intricate techniques that aim to approximate the posterior distribution, such as variational inference~\cite{blei2017variational} or variational auto-encoders~\cite{rosenbaum2021inferring}.
 
 \vfill
 \newpage
