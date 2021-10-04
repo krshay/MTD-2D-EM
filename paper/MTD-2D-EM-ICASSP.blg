@@ -5,44 +5,49 @@ Reallocating 'name_of_file' (item size: 1) to 8 items.
 The style file: IEEEbib.bst
 Reallocating 'name_of_file' (item size: 1) to 11 items.
 Database file #1: references.bib
-You've used 29 entries,
+Repeated entry---line 832 of file references.bib
+ : @article{zhao2013fourier
+ :                         ,
+I'm skipping whatever remains of this entry
+You've used 30 entries,
             1838 wiz_defined-function locations,
-            631 strings with 9147 characters,
-and the built_in function-call counts, 7139 in all, are:
-= -- 653
-> -- 337
+            640 strings with 9289 characters,
+and the built_in function-call counts, 7375 in all, are:
+= -- 677
+> -- 345
 < -- 4
-+ -- 124
-- -- 95
-* -- 608
-:= -- 1145
-add.period$ -- 30
-call.type$ -- 29
-change.case$ -- 28
++ -- 127
+- -- 97
+* -- 630
+:= -- 1182
+add.period$ -- 31
+call.type$ -- 30
+change.case$ -- 29
 chr.to.int$ -- 0
-cite$ -- 29
-duplicate$ -- 279
-empty$ -- 656
-format.name$ -- 95
-if$ -- 1564
+cite$ -- 30
+duplicate$ -- 287
+empty$ -- 679
+format.name$ -- 97
+if$ -- 1615
 int.to.chr$ -- 0
-int.to.str$ -- 29
-missing$ -- 30
-newline$ -- 148
-num.names$ -- 29
-pop$ -- 57
+int.to.str$ -- 30
+missing$ -- 31
+newline$ -- 153
+num.names$ -- 30
+pop$ -- 58
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 114
+skip$ -- 116
 stack$ -- 0
-substring$ -- 559
-swap$ -- 72
+substring$ -- 584
+swap$ -- 73
 text.length$ -- 4
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 0
 warning$ -- 0
-while$ -- 74
-width$ -- 31
-write$ -- 315
+while$ -- 77
+width$ -- 32
+write$ -- 326
+(There was 1 error message)
