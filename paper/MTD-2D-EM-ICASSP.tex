@@ -265,7 +265,7 @@ set $k \rightarrow k + 1$;
 		\centering
 		\includegraphics[width=0.75\columnwidth]{figures/experiment_SNR_err.pdf}
 	\end{subfigure}
-	\caption{The mean estimation error of recovering the target image~$F$, as a function of the SNR, by approximate EM (Algorithm~\ref{alg:approx_EM}) and autocorrelation analysis.}
+	\caption{The mean estimation error of recovering the target image~$F$, as a function of the SNR, by approximate EM (Algorithm~\ref{alg:approx_EM}) and autocorrelation analysis. Evidently, the approximate EM algorithms outperforms autocorrelation analysis in all SNRs.}
 \label{fig:noise_experiment}
 \end{figure}
 
@@ -278,7 +278,7 @@ set $k \rightarrow k + 1$;
 		\centering
 		\includegraphics[width=1\columnwidth]{figures/experiment_size_time.pdf}
 	\end{subfigure}
-	\caption{The mean estimation error of recovering the target image~$F$ (left) and running time (right), as a function of measurement size $N^2$ by approximate EM and autocorrelation analysis. For the estimation error, the black dashed lines illustrate a slope of~$-1/2$, as predicted by the law of large numbers. For the computation time, the black dashed line illustrates a slope of~$1$, implying a linear increase in computation time, as the number of patches~\mbox{$N_d = N^2 / L^2$} grows linearly in~$N^2$.}
+	\caption{The mean estimation error of recovering the target image~$F$ (left) and running time (right), as a function of measurement size $N^2$ by approximate EM and autocorrelation analysis. For the estimation error, the black dashed lines illustrate a slope of~$-1/2$, as predicted by the law of large numbers. For the computation time, the black dashed line illustrates a slope of~$1$, implying a linear increase in computation time, since the number of patches~\mbox{$N_d = N^2 / L^2$} grows linearly in~$N^2$.}
 \label{fig:size_experiment}
 \end{figure}
 
@@ -307,7 +307,7 @@ set $k \rightarrow k + 1$;
 		\centering
 		\includegraphics[width=1\columnwidth]{figures/experiment_K_time.pdf}
 	\end{subfigure}
-	\caption{The mean estimation error of recovering the target image~$F$ (left) and running time (right), as a function of~$K$---the size of the search space of rotations~\eqref{eq:Phi_set}---by approximate EM. The recovery error and running time using autocorrelation analysis are marked by the dashed horizontal red lines. For the running time, the black dashed line illustrates a slope of~$1$, which implies a linear increase in computation time, as the number of computations per patch depends linearly on~$K$. The results suggest that one can save running time by coarsely sampling  the rotations  without severely degrading  the estimation quality.}
+	\caption{The mean estimation error of recovering the target image~$F$ (left) and corresponding running time (right), as a function of the size of the search space of rotations~$K$, by approximate EM. The recovery error and running time using autocorrelation analysis are marked by  dashed horizontal red lines. For the running time, the black dashed line illustrates a slope of~$1$, which implies a linear increase in computation time, as the number of computations per patch depends linearly on~$K$. The results suggest that one can save running time by coarsely sampling  the search space of rotations  without severely degrading  the estimation quality.}
 	\label{fig:discretization_experiment}
 \end{figure}
 
@@ -333,25 +333,26 @@ In this section, we present numerical results for the approximate EM described i
 \label{eq:err_z}
 \text{relative error}_{\alpha} := \min_{\phi \in [0, 2\pi)} \frac{\|\alpha^* - \alpha_{\phi}\|_2}{\|\alpha^*\|_2},
 \end{equation}
-where~$\alpha^*$ is the true vector of expansion coefficients, and~$\alpha_{\phi}$ is the vector of coefficients of the estimated image, rotated by angle~$\phi$. In all experiments, the measurements were generated according to~(\ref{eq:model}) with density~\mbox{$\gamma = 0.04$}, where~\mbox{$p = \gamma \frac{N^2}{L^2}$}. The rotations  were drawn from a uniform distribution on~$[0, 2\pi)$, while the search space of the EM was discretized with a parameter $K$ according to~\eqref{eq:Phi_set}.
+where~$\alpha^*$ is the true vector of expansion coefficients, and~$\alpha_{\phi}$ is the vector of coefficients of the estimated image, rotated by~$\phi$. In all experiments, the measurements were generated according to~(\ref{eq:model}) with density~\mbox{$\gamma = 0.04$}. The rotations  were drawn from a uniform distribution on~$[0, 2\pi)$, while the search space of the EM was discretized with a parameter $K$ according to~\eqref{eq:Phi_set}.
  The target images are of diameter~\mbox{$L = 5 \text{ pixels}$}. Each entry of the target images was drawn i.i.d.\ from a uniform distribution on~$[0,1]$. Then, each image was normalized such that~\mbox{$\|F\|_\text{F} = 10$}, and expanded using its first~$10$ coefficients. The initializations of the EM and autocorrelation analysis iterations were drawn from the same distribution as the ground truth images, and~\mbox{$\gamma_{\text{init}} = 0.03$}.
  If the algorithms were initialized from several random  points,
-we calculated the estimation error of the image estimate whose final likelihood function is maximal (for approximate EM), or final objective function is minimal (for autocorrelation analysis). Figures~\ref{fig:noise_experiment}, \ref{fig:size_experiment} and~\ref{fig:discretization_experiment} present the mean error over~$40$ trials. The code to reproduce all experiments is publicly available at~\url{https://github.com/krshay/MTD-2D-EM}.
+we calculated the  error of the image estimate whose likelihood is maximal (for approximate EM), or  whose objective function is minimal (for autocorrelation analysis). Figures~\ref{fig:noise_experiment}, \ref{fig:size_experiment} and~\ref{fig:discretization_experiment} present the mean error over~$40$ trials. The code to reproduce all experiments is publicly available at~\url{https://github.com/krshay/MTD-2D-EM}.
 
 \subsection{Recovery error as a function of the SNR}
 \label{subsec:exp_SNR}
-Figure~\ref{fig:noise_experiment} presents recovery error as a function of the SNR. The measurements are of size~\mbox{$N = 2500 \text{ pixels}$}, and we use~\mbox{$K = 8$} possible rotations~\eqref{eq:Phi_set}, and~$5$ random initial guesses for~$\alpha$. To save computation time (see Section~\ref{sec:conclusion}), we initialize the approximate EM algorithm using the estimate achieved by autocorrelation analysis. We achieve a significant improvement in recovery accuracy using approximate EM, even though the search space of rotations is coarsely sampled, for all SNR regimes.
+Figure~\ref{fig:noise_experiment} presents recovery error as a function of the SNR. The measurements are of size~\mbox{$N^2 = 2500^2 \text{ pixels}$}, and we use~\mbox{$K = 8$} possible rotations~\eqref{eq:Phi_set}, and~$5$ random initial guesses for~$\alpha$. 
+To save computation time (see Section~\ref{sec:conclusion}), we initialized the approximate EM algorithm using the estimate achieved by autocorrelation analysis. We achieve a significant improvement in recovery accuracy using approximate EM, even though the search space of rotations is coarsely sampled, for all SNRs.
 
-In an additional numerical experiment with~$\text{SNR} = 2$ (low SNR, see Figure~\ref{fig:Micrographs_noise}), $N = 10000 \text{ pixels}$, and~\mbox{$K = 16$}, the relative error of approximate EM was~$\text{0.017}$, whereas the error of autocorrelation analysis was~$0.073$, more than four times larger.
+In an additional numerical experiment with~$\text{SNR} = 2$ (low SNR, see Figure~\ref{fig:Micrographs_noise}), $N^2 = 10000^2 \text{ pixels}$, and~\mbox{$K = 16$}, the relative error of approximate EM was~$\text{0.017}$, whereas the error of autocorrelation analysis was~$0.073$, more than four times larger.
 
 \subsection{Recovery error as a function of the measurement size}
 \label{subsec:exp_size}
-Figure~\ref{fig:size_experiment} presents recovery error and running time as a function of the measurement size $N^2$, with~\mbox{$\text{SNR} = 5$},~\mbox{$K = 16$} possible rotations, and~$5$ random initial guesses for~$\alpha$. Using approximate EM, the error decays \mbox{as~$1 / \sqrt{N^2}$}. The same trend is visible also for autocorrelation analysis for sufficiently large measurements. We achieve a significant improvement in recovery accuracy using approximate EM, although the search space of rotations is coarsely sampled. However, the computation time using our method is greater, and grows linearly with the measurement size. In particular, autocorrelation analysis is faster since it requires a single pass over the measurement, while the computational complexity of matching an image to the observed autocorrelations scale with~$L^2$~(which is much smaller than~$N^2$).
+Figure~\ref{fig:size_experiment} presents recovery error and running time as a function of the measurement size $N^2$, with~\mbox{$\text{SNR} = 5$},~\mbox{$K = 16$} possible rotations, and~$5$ random initial guesses for~$\alpha$. Using approximate EM, the error decays \mbox{as~$1 / \sqrt{N^2}$}. The same trend is visible also for autocorrelation analysis for sufficiently large measurements. We achieve a significant improvement in recovery accuracy using approximate EM. However, the computation time of our method is greater, and grows linearly with the measurement size. In particular, autocorrelation analysis is faster since it requires a single pass over the measurement, while the computational complexity of matching an image to the observed autocorrelations scale with~$L^2$~(which is much smaller than~$N^2$).
 
 \subsection{Recovery error as a function of discretization of rotations}
 \label{subsec:exp_discretization}
-Figure~\ref{fig:discretization_experiment} presents recovery error and running time as a function of~$K$, the size of the search space of rotations, for measurements with~\mbox{$\text{SNR} = 5$}, $N = 1500$, and one random initial guess for~$\alpha$. %The results are compared against autocorrelation analysis.
-Remarkably, even when the EM searches over only~$4$ rotations (recall that the rotations are drawn from a continuous distribution), the obtained estimation errors are similar to the estimation errors of autocorrelation analysis, which takes all possible rotations into account. As expected, the computation time grows linearly with the parameter~$K$. This implies that one can save running time by coarsely sampling  the rotations without severely degrading  the estimation quality.
+Figure~\ref{fig:discretization_experiment} presents recovery error and running time as a function of~$K$, the size of the search space of rotations, for measurements with~\mbox{$\text{SNR} = 5$}, $N = 1500$, and one  initial guess for~$\alpha$. %The results are compared against autocorrelation analysis.
+Remarkably, even when the EM searches over only~$4$ rotations (recall that the rotations are drawn from a continuous distribution), the obtained estimation error is similar to the estimation error of autocorrelation analysis, which takes all possible (infinitely many) rotations into account. As expected, the computation time grows linearly with the parameter~$K$. This implies that one can save running time by coarsely sampling  the search space of rotations without severely degrading  the estimation quality.
 
 \section{Conclusion}
 \label{sec:conclusion}
