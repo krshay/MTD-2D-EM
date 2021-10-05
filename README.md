@@ -7,7 +7,7 @@
  
  To reproduce the experiments from Section 3.2 run the script est_err_size.py.
  
- To reproduce the experiments from Section 3.3, run the script est_err_K.py.
+ To reproduce the experiments from Section 3.3, run the script est_err_discretization.py.
 
  
  # Utilities:
