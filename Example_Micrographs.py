@@ -16,7 +16,6 @@ from Utils.generate_clean_micrograph_2d import generate_clean_micrograph_2d_rots
 # plt.close("all")
 
 if __name__ == '__main__':
-    X = plt.imread("./images/molecule9.png")
     X = np.random.rand(5, 5)
     L = np.shape(X)[0]
     X = X
