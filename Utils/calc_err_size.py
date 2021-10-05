@@ -15,19 +15,24 @@ from Utils.EM_funcs import EM
 import time
 
 def calc_err_size_both(L, ne, sizes, SNR, gamma, K, sd):
-    """ Calculate estimation error in estimating a specific target image, multiple micrograph sizes. For the case of EM PSF and TSF.
+    """ Calculate estimation error in estimating a specific target image, multiple sizes.
 
     Args:
         L: diameter of the target image
         ne: number of expansion coefficients
-        sizes: an array containing the desired values of N, the size of the micrographs to be generated
+        sizes: an array containing the desired values of N, the size of the measurements to be generated
+        SNR: the measurement's SNR
+        gamma: the density of the images in the measurement
+        K: angular search space size
         sd: a seed
 
     Returns:
         errs_EM: an array containing the estimation errors for each size, EM
         costs_EM: an array containing the objective function values for each size, EM
-        errs_ac: an array containing the estimation errors for each size, Algorithm 1
-        costs_ac: an array containing the objective function values for each size, Algorithm 1
+        times_EM: an array containing the estimation running times for each size, EM
+        errs_ac: an array containing the estimation errors for each size, autocorrelation analysis
+        costs_ac: an array containing the objective function values for each size, autocorrelation analysis
+        times_ac: an array containing the estimation running times for each size, autocorrelation analysis
     """
     # %% preliminary definitions
     np.random.seed(sd)
@@ -64,9 +69,10 @@ def calc_err_size_both(L, ne, sizes, SNR, gamma, K, sd):
     rho_init = np.zeros((2*L, 2*L))
     for i in range(2*L):
         for j in range(2*L):
-            rho_init[i, j] = (1 - beta0) / (2*L - 1)**2
+            rho_init[i, j] = (1 - beta0) / (2*L - 1)**2 # (2L - 1)^2 possible configurations inside a patch
             if i == L or j == L:
-                rho_init[i, j] = beta0 / (4*L - 1)
+                rho_init[i, j] = beta0 / (4*L - 1) # (4L - 1) configurations for an empty patch
+                
 
     cs = np.zeros((NumGuesses, ne))
     zs = np.zeros((NumGuesses, ne), dtype=np.complex_)
@@ -135,17 +141,5 @@ def calc_err_size_both(L, ne, sizes, SNR, gamma, K, sd):
             errs_EM[idx, jj] = est_err_coeffs_EM[0]
             costs_EM[idx, jj] = log_likelihood_EM
             times_EM[idx, jj] = time_split + stopEM
-        np.save(f'errs_EM_sd{sd}_idx{idx}.npy', errs_EM)
-        np.save(f'costs_EM_sd{sd}_idx{idx}.npy', costs_EM)
-        np.save(f'times_EM_sd{sd}_idx{idx}.npy', times_EM)
-        np.save(f'errs_ac_sd{sd}_idx{idx}.npy', errs_ac)
-        np.save(f'costs_ac_sd{sd}_idx{idx}.npy', costs_ac)
-        np.save(f'times_ac_sd{sd}_idx{idx}.npy', times_ac)
-        print(f'finished iter #{sd}, size = {sz}. Error for EM = {errs_EM[idx, 0]}; error for autocorrelation analysis = {errs_ac[idx, 0]}.')
-    np.save(f'errs_EM_sd{sd}.npy', errs_EM)
-    np.save(f'costs_EM_sd{sd}.npy', costs_EM)
-    np.save(f'times_EM_sd{sd}.npy', times_EM)
-    np.save(f'errs_ac_sd{sd}.npy', errs_ac)
-    np.save(f'costs_ac_sd{sd}.npy', costs_ac)
-    np.save(f'times_ac_sd{sd}.npy', times_ac)
+
     return errs_EM, costs_EM, times_EM, errs_ac, costs_ac, times_ac

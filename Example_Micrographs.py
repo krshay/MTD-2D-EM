@@ -52,30 +52,3 @@ if __name__ == '__main__':
     SNR = 50
     sigma2 = np.linalg.norm(Xrec)**2 / (SNR * np.pi * (L//2)**2)
     y3 = y_clean + np.random.default_rng().normal(loc=0, scale=np.sqrt(sigma2), size=np.shape(y_clean))
-    
-    width = 3.487
-    height = width / 1.618
-    # plt.close("all")
-    ttls = ['SNR = 10', 'SNR = 0.1']
-    ys = [y3, y1, y2]
-    for n in range(3):
-        fig = plt.figure()#subplots(1, 2)
-    
-        ax = plt.axes()
-        im = ax.imshow(ys[n], cmap="gray")   
-        divider = make_axes_locatable(ax)
-        cax = divider.append_axes("right", size="5%", pad=0.05)
-        cbar = plt.colorbar(im, cax=cax)
-        cbar.ax.tick_params(labelsize=20)
-
-        ax.tick_params(axis='both', which='both', bottom=False, top=False, labelbottom=False, right=False, left=False, labelleft=False)
-
-        fig.set_size_inches(4*width, 4*height)
-        if n == 0:
-            fig.savefig(r'C:\Users\kreym\Google Drive\PhD\Documents\MTD-2D-EM-ICASSP\figures\Micrographs_noise_a.pdf', bbox_inches='tight')
-        else:
-            if n == 1:
-                fig.savefig(r'C:\Users\kreym\Google Drive\PhD\Documents\MTD-2D-EM-ICASSP\figures\Micrographs_noise_b.pdf', bbox_inches='tight')
-            else:
-                fig.savefig(r'C:\Users\kreym\Google Drive\PhD\Documents\MTD-2D-EM-ICASSP\figures\Micrographs_noise_clean.pdf', bbox_inches='tight')
-

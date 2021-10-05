@@ -10,18 +10,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 from Utils.fb_funcs import expand_fb, calcT
 from Utils.generate_clean_micrograph_2d import generate_clean_micrograph_2d_rots
-from Utils.EM_funcs import EM_parallel, EM, rearangeB, PsiPsi, calcB_CTZs
+from Utils.EM_funcs import EM_parallel, rearangeB, PsiPsi, calcB_CTZs
 from Utils.fb_funcs import min_err_coeffs
 from Utils.funcs_calc_moments import M2_2d, M3_2d
 import Utils.optimization_funcs_rot
-
-from Utils.calcM3_parallel import calcM3_parallel_micrographs
 
 import time
 
 plt.close("all")
 
 if __name__ == '__main__':
+    # script to show successful image estimation using approximate EM in low SNR
     np.random.seed(10)
     F = np.random.rand(5, 5)
     L = np.shape(F)[0]
@@ -45,11 +44,11 @@ if __name__ == '__main__':
     _, z_init, _, _, _ = expand_fb(F_init, ne)
     c_initial = np.real(T @ z_init)
     
-    SNR = 5
+    SNR = 2
     sigma2 = np.linalg.norm(F)**2 / (L**2 *SNR)
     
     gamma = 0.04
-    N = 1000
+    N = 10000
     N = (N // L) * L
     M_clean, s, locs = generate_clean_micrograph_2d_rots(c, kvals, Bk, W, L, N, gamma*(N/L)**2, T, seed=100)
 
@@ -106,7 +105,6 @@ if __name__ == '__main__':
     gamma_ests_ac = np.zeros((numGuesses, ))
     errs_ac = np.zeros((numGuesses, ))
     for g in range(numGuesses):
-
         st = time.time()
         X_est_ac = Utils.optimization_funcs_rot.optimize_2d(np.concatenate((np.reshape(gamma_initial, (1,)), c_initial)), Bk, T, kvals, M1_y, M2_y, M3_y, sigma2, L, 1) 
         time_ac = time.time() - st
@@ -116,17 +114,15 @@ if __name__ == '__main__':
         est_err_coeffs_ac = min_err_coeffs(z, z_est_ac, kvals)
         err_ac = est_err_coeffs_ac[0]
         errs_ac[g] = err_ac
-        print(f'done with autocorrelation analysis. N = {N}. error of {err_ac}, objective function of {X_est_ac.fun}')
         costs_ac[g] = X_est_ac.fun
         z_ests_ac[g, :] = z_est_ac
         gamma_ests_ac[g] = gamma_est_ac
     
-    # # %% Approximate EM
-    # Bs = rearangeB(B)
-    # PsiPsi_vals = PsiPsi(Bs, L, K, nu, kvals)
-    # BCTZs = calcB_CTZs(B, K, L, kvals)
-    # start = time.time()
-    # z_est_parallel, rho_est, log_likelihood, numiters = EM_parallel(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2, BCTZs, PsiPsi_vals, z)
-    # print(time.time() - start)
-    
+    # %% Approximate EM
+    Bs = rearangeB(B)
+    PsiPsi_vals = PsiPsi(Bs, L, K, nu, kvals)
+    BCTZs = calcB_CTZs(B, K, L, kvals)
+    start = time.time()
+    z_est_parallel, rho_est, log_likelihood, numiters = EM_parallel(Ms, z_init, rho_init, L, K, Nd, B, Bk, kvals, nu, sigma2, BCTZs, PsiPsi_vals)
+    time_EM = time.time() - start
 

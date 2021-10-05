@@ -6,7 +6,7 @@ Created on Sat Jul 25 15:46:42 2020
 """
 
 import numpy as np
-from Utils.funcs_calc_moments_rot import calcS3_x_grad, calcS3_x_neigh_grad, calcS3_x_triplets_grad, calcS2_x_grad_notparallel, calcS2_x_neigh_grad_notparallel, calcS3_x_grad_neigh_triplets_parallel
+from Utils.funcs_calc_moments_rot import calcS3_x_grad, calcS2_x_grad_notparallel
 
 def calc_acs_grads_rot_notparallel(Bk, z, kvals, L, k1_map, map3):
     """ Calclulate of all needed autocorrelations and gradients.
