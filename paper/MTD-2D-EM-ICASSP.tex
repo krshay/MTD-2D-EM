@@ -217,7 +217,7 @@ where~$p(M_m|\vec{\ell}, \phi, \alpha)$ is given by~(\ref{eq:likelihood_patch}).
 The~\mbox{M-step} updates the image estimate $\alpha$ and~$\rho$ by maximizing~$Q(\alpha, \rho|\alpha_k, \rho_k)$ under the constraint that~$\rho$ lies on the simplex~$\Delta_{4L^2}$:
 \begin{equation}
 \label{eq:M_step}
-\alpha_{k+1}, \rho_{k+1} = \arg \max_{\alpha, \rho} Q(\alpha, \rho|\alpha_k, \rho_k) \text{ s.t. } \rho \in \Delta_{4L^2}.
+\alpha_{k+1}, \rho_{k+1} = \arg \max_{\alpha, \rho} Q(\alpha, \rho|\alpha_k, \rho_k) \quad \text{s.t.} \quad  \rho \in \Delta_{4L^2}.
 \end{equation}
 The constrained maximization of~(\ref{eq:M_step}) can be achieved with the unconstrained maximization of the Lagrangian
 \begin{equation}
@@ -265,7 +265,7 @@ set $k \rightarrow k + 1$;
 		\centering
 		\includegraphics[width=0.75\columnwidth]{figures/experiment_SNR_err.pdf}
 	\end{subfigure}
-	\caption{The mean estimation error of recovering the target image~$F$, as a function of the SNR, by approximate EM (Algorithm~\ref{alg:approx_EM}) and autocorrelation analysis. Evidently, the approximate EM algorithms outperforms autocorrelation analysis in all SNRs.}
+	\caption{The mean estimation error of recovering the target image~$F$, as a function of the SNR, by approximate EM (Algorithm~\ref{alg:approx_EM}) and autocorrelation analysis. Evidently, the approximate EM algorithm outperforms autocorrelation analysis in all SNRs.}
 \label{fig:noise_experiment}
 \end{figure}
 
@@ -278,7 +278,7 @@ set $k \rightarrow k + 1$;
 		\centering
 		\includegraphics[width=1\columnwidth]{figures/experiment_size_time.pdf}
 	\end{subfigure}
-	\caption{The mean estimation error of recovering the target image~$F$~(left) and running time (right), as a function of measurement size~$N^2$ by approximate EM and autocorrelation analysis. For the estimation error, the black dashed lines illustrate a slope of~$-1/2$, as predicted by the law of large numbers. For the computation time, the black dashed line illustrates a slope of~$1$, implying a linear increase in computation time, since the number of patches~\mbox{$N_d = N^2 / L^2$} grows linearly in~$N^2$.}
+	\caption{The mean estimation error of recovering the target image~$F$~(left) and running time (right), as a function of the measurement size~$N^2$ by approximate EM and autocorrelation analysis. For the estimation error, the black dashed lines illustrate a slope of~$-1/2$, as predicted by the law of large numbers. For the computation time, the black dashed line illustrates a slope of~$1$, implying a linear increase in computation time, since the number of patches~\mbox{$N_d = N^2 / L^2$} grows linearly in~$N^2$.}
 \label{fig:size_experiment}
 \end{figure}
 
@@ -333,7 +333,7 @@ In this section, we present numerical results for the approximate EM described i
 \label{eq:err_z}
 \text{relative error}_{\alpha} := \min_{\phi \in [0, 2\pi)} \frac{\|\alpha^* - \alpha_{\phi}\|_2}{\|\alpha^*\|_2},
 \end{equation}
-where~$\alpha^*$ is the true vector of expansion coefficients, and~$\alpha_{\phi}$ is the vector of coefficients of the estimated image, rotated by~$\phi$. In all experiments, the measurements were generated according to~(\ref{eq:model}) with density~\mbox{$\gamma = 0.04$}. The rotations  were drawn from a uniform distribution on~$[0, 2\pi)$, while the search space of the EM was discretized with a parameter $K$ according to~\eqref{eq:Phi_set}. The target images are of diameter~\mbox{$L = 5 \text{ pixels}$}. Each entry of the target images was drawn i.i.d.\ from a uniform distribution on~$[0,1]$. Then, each image was normalized such that~\mbox{$\|F\|_\text{F} = 10$}, and expanded using its first~$10$ coefficients. The initializations of the EM and autocorrelation analysis iterations were drawn from the same distribution as the ground truth images, and~\mbox{$\gamma_{\text{init}} = 0.03$}. If the algorithms were initialized from several random  points, we calculated the  error of the image estimate whose likelihood is maximal (for approximate EM), or  whose objective function is minimal (for autocorrelation analysis). Figures~\ref{fig:noise_experiment}, \ref{fig:size_experiment} and~\ref{fig:discretization_experiment} present the mean error over~$40$ trials. The code to reproduce all experiments is publicly available at~\url{https://github.com/krshay/MTD-2D-EM}.
+where~$\alpha^*$ is the true vector of expansion coefficients, and~$\alpha_{\phi}$ is the vector of coefficients of the estimated image, rotated by~$\phi$. In all experiments, the measurements were generated according to~(\ref{eq:model}) with density~\mbox{$\gamma = 0.04$}. The rotations  were drawn from a uniform distribution on~$[0, 2\pi)$, while the search space of the EM was discretized with a parameter $K$ according to~\eqref{eq:Phi_set}. The target images are of diameter~\mbox{$L = 5 \text{ pixels}$}. Each entry of the target images was drawn i.i.d.\ from a uniform distribution on~$[0,1]$. Then, each image was normalized such that~\mbox{$\|F\|_\text{F} = 10$}, and expanded using its first~$10$ coefficients as in~\eqref{eq:expansion}. The initializations of the EM and autocorrelation analysis iterations were drawn from the same distribution as the ground truth images, and~\mbox{$\gamma_{\text{init}} = 0.03$}. If the algorithms were initialized from several random  points, we calculated the  error of the image estimate whose likelihood is maximal (for approximate EM), or  whose objective function is minimal (for autocorrelation analysis). Figures~\ref{fig:noise_experiment}, \ref{fig:size_experiment} and~\ref{fig:discretization_experiment} present the mean error over~$40$ trials. The code to reproduce all experiments is publicly available at~\url{https://github.com/krshay/MTD-2D-EM}.
 
 \subsection{Recovery error as a function of the SNR}
 \label{subsec:exp_SNR}
